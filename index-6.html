@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#070d1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Cuban Boxing">
+<title>Cuban Boxing App</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Barlow:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:#070d1a;color:#fff;font-family:'Barlow Condensed','Impact',sans-serif;min-height:100vh;overflow-x:hidden}
+#root{max-width:480px;margin:0 auto;position:relative}
+input,select,textarea{font-family:'Barlow',sans-serif;font-size:14px}
+button{cursor:pointer;font-family:'Barlow Condensed',sans-serif;transition:all .12s}
+button:active{transform:scale(.96);opacity:.82}
+.page{display:none;padding:14px 14px 90px;animation:fi .25s ease}
+.page.on{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+#hdr{background:linear-gradient(135deg,#0a1628,#0f1e35);border-bottom:2px solid #D4A017;padding:11px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+#nav{position:fixed;bottom:0;left:0;right:0;background:#0a1628;border-top:2px solid #D4A017;display:flex;z-index:50;max-width:480px;margin:0 auto}
+.nb{flex:1;background:none;border:none;color:#4a6a8a;padding:10px 4px 6px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9px;font-weight:700;letter-spacing:1px}
+.nb.on{color:#D4A017}.nb .ic{font-size:20px;line-height:1}
+.nb .bar{width:24px;height:2px;background:#D4A017;border-radius:1px;margin-top:2px}
+.card{background:#0f1e35;border-radius:12px;padding:14px;margin-bottom:10px;border:1px solid #1e3050}
+.btn{width:100%;border:none;border-radius:10px;padding:13px;font-weight:800;font-size:15px;letter-spacing:1px;cursor:pointer}
+.btn-g{background:#D4A017;color:#070d1a}
+.btn-d{background:#1e3050;color:#D4A017}
+.btn-r{background:#8b1a1a;color:#fff}
+.btn-sm{padding:8px 12px;font-size:12px;width:auto;border-radius:6px}
+.inp{width:100%;background:#0f1e35;border:1px solid #1e3050;border-radius:8px;padding:10px 12px;color:#fff;font-size:14px;outline:none}
+.inp:focus{border-color:#D4A017}
+.lbl{font-size:11px;color:#7a9ab5;display:block;margin-bottom:4px;letter-spacing:.5px;font-family:'Barlow'}
+.sh{display:flex;align-items:center;gap:8px;margin-bottom:8px;margin-top:14px}
+.sh span:first-child{font-size:14px}
+.sh .sl{flex:1;height:1px;background:#1e3050}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:100;display:flex;align-items:flex-end}
+.modal-box{background:#0a1628;border-radius:20px 20px 0 0;padding:20px 16px;width:100%;max-height:92vh;overflow-y:auto;border:1px solid #1e3050;animation:fi .2s ease}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pin-box{display:flex;justify-content:center;gap:8px;margin:16px 0}
+.pin-dot{width:16px;height:16px;border-radius:50%;background:#1e3050;border:2px solid #D4A017}
+.pin-dot.filled{background:#D4A017}
+.pin-num-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;max-width:260px;margin:0 auto}
+.pin-btn{background:#0f1e35;border:1px solid #1e3050;border-radius:12px;padding:18px;font-size:24px;font-weight:800;color:#fff}
+.pin-btn:active{background:#D4A017;color:#070d1a}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#D4A017;border-radius:2px}
+.user-menu-btn{background:none;border:none;color:#D4A017;font-size:18px;cursor:pointer;padding:4px}
+.user-menu-dropdown{display:none;position:absolute;top:50px;right:10px;background:#0f1e35;border:1px solid #D4A017;border-radius:10px;z-index:101;min-width:180px;box-shadow:0 4px 12px rgba(0,0,0,.4)}
+.user-menu-dropdown.show{display:block}
+.user-menu-item{padding:12px 16px;border-bottom:1px solid #1e3050;color:#fff;font-size:13px;font-family:'Barlow',sans-serif;cursor:pointer}
+.user-menu-item:hover{background:#1e3050;color:#D4A017}
+.athlete-card{background:#0f1e35;border:1px solid #1e3050;border-radius:10px;padding:12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+</style>
+</head>
+<body>
+<div id="root">
+<div id="app"></div>
+<div id="main-shell" style="display:none">
+  <div id="hdr" style="position:relative">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div id="hdr-logo" style="width:44px;height:44px;flex-shrink:0"></div>
+      <div><div style="font-weight:900;font-size:15px;letter-spacing:1.5px;color:#fff;line-height:1.1">CUBAN BOXING APP</div><div style="font-size:9px;color:#D4A017;letter-spacing:1px;font-family:Barlow;font-weight:600">OSVIMER COACH</div></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;position:relative">
+      <div style="text-align:right"><div id="hdr-date" style="font-size:10px;color:#7a9ab5;font-family:Barlow"></div><div id="hdr-user" style="font-size:9px;color:#D4A017;font-family:Barlow"></div></div>
+      <button onclick="toggleLang()" id="lang-btn" style="background:linear-gradient(135deg,#D4A017,#f0c040);border:none;color:#070d1a;border-radius:8px;padding:7px 10px;font-weight:900;font-size:13px;letter-spacing:1px">EN</button>
+      <button class="user-menu-btn" onclick="toggleUserMenu()">⚙️</button>
+      <div id="user-menu-dropdown" class="user-menu-dropdown">
+        <div class="user-menu-item" onclick="toggleUserMenu();confirmChangeUser()">⇄ Cambiar usuario</div>
+      </div>
+    </div>
+  </div>
+  <div id="pages">
+    <div id="pg-home" class="page on"></div>
+    <div id="pg-athletes" class="page"></div>
+    <div id="pg-training" class="page"></div>
+    <div id="pg-fights" class="page"></div>
+    <div id="pg-tactics" class="page"></div>
+    <div id="pg-nutrition" class="page"></div>
+    <div id="pg-store" class="page"></div>
+    <div id="pg-notes" class="page"></div>
+  </div>
+  <nav id="nav"></nav>
+</div>
+<div id="modal-wrap"></div>
+</div>
+
+<script>
+const COACH_PIN="1967";
+const DA=[{id:"a1",name:"Redon Dubois",pin:"1234",weight:65,height:175},{id:"a2",name:"Gabriel Maestre",pin:"1234",weight:70,height:180},{id:"a3",name:"Juan Carlos Caridad",pin:"1234",weight:72,height:182}];
+const DF=[{id:"f1",date:"2025-03-15",opp:"Jaime Munguia",style:"Potencia"},{id:"f2",date:"2025-02-08",opp:"Luis Paquiao",style:"Technica"}];
+
+var ST={lang:"es",isCoach:false,user:null,athletes:[],fights:[]};
+var _pinBuf="",_pinMode="athlete";
+
+function ld(k,d){try{return JSON.parse(localStorage.getItem(k))||d;}catch(e){return d;}}
+function sv(k,v){localStorage.setItem(k,JSON.stringify(v));}
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
+
+const tls={es:{home:"INICIO",athletes:"ATLETAS",training:"ENTRENAMIENTOS",fights:"PELEAS",tactics:"TACTICAS",nutrition:"NUTRICION",store:"TIENDA",notes:"NOTAS",welcomeCoach:"Bienvenido Coach",welcomeAthlete:"Bienvenido",coachMode:"MODO ENTRENADOR",athMode:"MODO ATLETA",selectAth:"Selecciona atleta",enterPin:"Ingresa tu PIN",enterCoachPin:"Ingresa PIN entrenador",wrongPin:"PIN incorrecto",addAthlete:"Agregar atleta",save:"Guardar",cancel:"Cancelar",profile:"Perfil"},en:{home:"HOME",athletes:"ATHLETES",training:"TRAINING",fights:"FIGHTS",tactics:"TACTICS",nutrition:"NUTRITION",store:"STORE",notes:"NOTES",welcomeCoach:"Welcome Coach",welcomeAthlete:"Welcome",coachMode:"COACH MODE",athMode:"ATHLETE MODE",selectAth:"Select athlete",enterPin:"Enter PIN",enterCoachPin:"Enter coach PIN",wrongPin:"Wrong PIN",addAthlete:"Add athlete",save:"Save",cancel:"Cancel",profile:"Profile"}};
+
+function t(){return tls[ST.lang]||tls.es;}
+function L(es,en){return ST.lang==="es"?es:en;}
+
+function toggleUserMenu(){document.getElementById("user-menu-dropdown").classList.toggle("show");}
+function closeUserMenu(){document.getElementById("user-menu-dropdown").classList.remove("show");}
+document.addEventListener("click",function(e){var m=document.getElementById("user-menu-dropdown");var btn=document.querySelector(".user-menu-btn");if(m&&!m.contains(e.target)&&!btn.contains(e.target)){closeUserMenu();}});
+
+function closeM(){document.getElementById("modal-wrap").innerHTML="";}
+
+function goTab(pg){document.querySelectorAll(".page").forEach(p=>p.classList.remove("on"));var p=document.getElementById("pg-"+pg);if(p)p.classList.add("on");document.querySelectorAll(".nb").forEach(n=>n.classList.remove("on"));var nb=document.querySelector('[data-page="'+pg+'"]');if(nb)nb.classList.add("on");if(pg==="athletes")renderAthletes();if(pg==="home")renderHome();}
+
+function renderNav(){var nav=document.getElementById("nav");var items=[{icon:"🏠",label:L("INICIO","HOME"),page:"home"},{icon:"👥",label:t().athletes,page:"athletes"},{icon:"💪",label:t().training,page:"training"},{icon:"🥊",label:t().fights,page:"fights"},{icon:"📋",label:t().tactics,page:"tactics"},{icon:"🥗",label:t().nutrition,page:"nutrition"},{icon:"🛍️",label:t().store,page:"store"},{icon:"📝",label:t().notes,page:"notes"}];var h="";items.forEach(n=>{h+='<button class="nb" data-page="'+n.page+'" onclick="goTab(\''+n.page+'\')"><span class="ic">'+n.icon+'</span><span>'+n.label+'</span><span class="bar"></span></button>';});nav.innerHTML=h;}
+
+function renderHome(){var tl=t();var h='<div style="display:flex;align-items:center;gap:8px;margin-top:14px"><span style="font-size:18px">'+(ST.isCoach?"👨‍🏫":"💪")+'</span><span style="font-size:13px;font-weight:800;color:#D4A017">'+(ST.isCoach?tl.welcomeCoach:tl.welcomeAthlete)+'</span><span style="flex:1;height:1px;background:#1e3050"></span></div>';if(ST.isCoach){h+='<div class="card"><div style="font-size:12px;color:#fff;margin-bottom:8px">📊 '+tl.athletes+'</div><div style="font-size:28px;color:#D4A017;font-weight:900">'+ST.athletes.length+'</div></div>';}else{h+='<div class="card"><div style="font-size:12px;color:#fff;margin-bottom:8px">👤 '+tl.profile+'</div><div style="font-size:14px;color:#D4A017;font-weight:900">'+esc(ST.user?ST.user.name:"")+'</div><button class="btn btn-d" style="margin-top:12px" onclick="openChangePinModal()">🔐 Cambiar PIN</button></div>';}h+='<div class="card" style="border-color:#D4A017"><button class="btn btn-d" style="width:100%" onclick="goTab(\''+(ST.isCoach?'athletes':'training')+'\')">⚡ '+(ST.isCoach?tl.athletes:t().training)+'</button></div>';document.getElementById("pg-home").innerHTML=h;}
+
+function renderAthletes(){var tl=t();var h='<div style="display:flex;align-items:center;gap:8px;margin-top:14px"><span style="font-size:18px">👥</span><span style="font-size:13px;font-weight:800;color:#D4A017">'+tl.athletes+'</span><span style="flex:1;height:1px;background:#1e3050"></span></div>';if(ST.isCoach)h+='<button class="btn btn-g" style="margin:14px 0">AGREGAR ATLETA</button>';ST.athletes.forEach(a=>{h+='<div class="athlete-card"><div><div style="color:#D4A017;font-weight:900">'+esc(a.name)+'</div><div style="font-size:11px;color:#7a9ab5">Peso: '+a.weight+' kg</div></div>';if(ST.isCoach)h+='<div style="display:flex;gap:6px"><button class="btn btn-d btn-sm" onclick="openAthlete(\''+a.id+'\')">EDITAR</button><button class="btn btn-r btn-sm" onclick="delAthlete(\''+a.id+'\')">ELIMINAR</button></div>';h+='</div>';});document.getElementById("pg-athletes").innerHTML=h;}
+
+function openAthlete(athId){var ath=athId?ST.athletes.find(a=>a.id===athId):null;var c='<div style="margin-bottom:16px"><div style="font-size:16px;font-weight:900;color:#D4A017;margin-bottom:14px">'+(ath?"Editar":"Agregar")+'</div><div style="margin-bottom:12px"><label class="lbl">Nombre</label><input type="text" class="inp" id="ath-name" value="'+(ath?ath.name:"")+'"></div><div style="margin-bottom:12px"><label class="lbl">Peso (kg)</label><input type="number" class="inp" id="ath-weight" value="'+(ath?ath.weight:"")+'"></div><div style="margin-bottom:12px"><label class="lbl">Altura (cm)</label><input type="number" class="inp" id="ath-height" value="'+(ath?ath.height:"")+'"></div><div style="display:flex;gap:8px"><button class="btn btn-g" onclick="saveAthlete(\''+athId+'\')" style="flex:1">Guardar</button><button class="btn btn-d" onclick="closeM()" style="flex:1">Cancelar</button></div></div>';document.getElementById("modal-wrap").innerHTML='<div class="modal-bg" onclick="closeM()"><div class="modal-box" onclick="event.stopPropagation()">'+c+'</div></div>';}
+
+function saveAthlete(athId){var name=document.getElementById("ath-name").value.trim();var weight=parseInt(document.getElementById("ath-weight").value)||0;var height=parseInt(document.getElementById("ath-height").value)||0;if(!name){alert("Nombre requerido");return;}if(athId){var idx=ST.athletes.findIndex(a=>a.id===athId);if(idx>=0){ST.athletes[idx].name=name;ST.athletes[idx].weight=weight;ST.athletes[idx].height=height;}}else{ST.athletes.push({id:"a"+Date.now(),name:name,pin:"1234",weight:weight,height:height});}sv("cba_athletes",ST.athletes);closeM();renderAthletes();}
+
+function delAthlete(athId){ST.athletes=ST.athletes.filter(a=>a.id!==athId);sv("cba_athletes",ST.athletes);renderAthletes();}
+
+function openChangePinModal(){var c='<div style="margin-bottom:16px"><div style="font-size:16px;font-weight:900;color:#D4A017;margin-bottom:14px">CAMBIAR PIN</div><div style="margin-bottom:12px"><label class="lbl">PIN ACTUAL</label><input type="password" class="inp" id="old-pin" maxlength="4"></div><div style="margin-bottom:12px"><label class="lbl">NUEVO PIN</label><input type="password" class="inp" id="new-pin" maxlength="4"></div><div style="margin-bottom:12px"><label class="lbl">CONFIRMAR PIN</label><input type="password" class="inp" id="confirm-pin" maxlength="4"></div><div id="pin-err" style="text-align:center;color:#c0392b;font-size:13px;margin-bottom:12px;height:20px"></div><div style="display:flex;gap:8px"><button class="btn btn-g" onclick="saveNewPin()" style="flex:1">Guardar</button><button class="btn btn-d" onclick="closeM()" style="flex:1">Cancelar</button></div></div>';document.getElementById("modal-wrap").innerHTML='<div class="modal-bg" onclick="closeM()"><div class="modal-box" onclick="event.stopPropagation()">'+c+'</div></div>';}
+
+function saveNewPin(){var oldPin=document.getElementById("old-pin").value;var newPin=document.getElementById("new-pin").value;var confirmPin=document.getElementById("confirm-pin").value;var err=document.getElementById("pin-err");if(oldPin!==(ST.user.pin||"1234")){err.textContent="PIN actual incorrecto";return;}if(newPin!==confirmPin){err.textContent="PINs no coinciden";return;}var idx=ST.athletes.findIndex(a=>a.id===ST.user.id);if(idx>=0){ST.athletes[idx].pin=newPin;ST.user.pin=newPin;sv("cba_athletes",ST.athletes);}closeM();alert("PIN cambiado correctamente");}
+
+function updateHdr(){var now=new Date();document.getElementById("hdr-date").textContent=now.toLocaleDateString(ST.lang==="es"?"es-ES":"en-US",{weekday:"short",day:"numeric",month:"short"}).toUpperCase();document.getElementById("hdr-user").textContent=ST.isCoach?"COACH":ST.user?ST.user.name:"ATLETA";document.getElementById("lang-btn").textContent=ST.lang==="es"?"EN":"ES";}
+
+function toggleLang(){ST.lang=ST.lang==="es"?"en":"es";sv("cba_lang",ST.lang);updateHdr();renderNav();goTab(document.querySelector(".nb.on")?document.querySelector(".nb.on").dataset.page:"home");}
+
+function showLogin(){var app=document.getElementById("app");var shell=document.getElementById("main-shell");shell.style.display="none";app.style.display="block";var tl=t();app.innerHTML='<div style="min-height:100vh;background:#070d1a;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px"><div style="text-align:center;margin-bottom:30px;font-size:60px;font-weight:900;color:#D4A017">CBA</div><div style="text-align:center;margin-bottom:24px"><div style="font-size:18px;font-weight:900;color:#D4A017;margin-bottom:8px">BIENVENIDO</div></div><button class="btn btn-g" style="margin-bottom:12px" onclick="enterPin(\'athlete\')">'+tl.athMode+'</button><button class="btn btn-d" style="margin-bottom:20px" onclick="enterPin(\'coach\')">'+tl.coachMode+'</button><button onclick="toggleLang()" style="width:100%;background:linear-gradient(135deg,#D4A017,#f0c040);border:none;color:#070d1a;border-radius:10px;padding:12px;font-weight:900;cursor:pointer">'+(ST.lang==="es"?"EN":"ES")+'</button></div>';}
+
+function enterPin(mode){_pinMode=mode;var tl=t();var c='<div style="font-size:14px;color:#7a9ab5;text-align:center;margin-bottom:8px">'+(mode==="coach"?tl.enterCoachPin:tl.enterPin)+'</div><div class="pin-box" id="pin-display"><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div></div><div class="pin-num-grid">';[1,2,3,4,5,6,7,8,9,"",0,"⌫"].forEach(n=>{c+='<button class="pin-btn" onclick="pinInput(\''+n+'\')">'+n+'</button>';});c+='</div><div id="pin-err" style="text-align:center;color:#c0392b;font-size:13px;margin-top:8px;height:20px"></div><button onclick="showLogin()" style="width:100%;background:none;border:none;color:#7a9ab5;margin-top:16px;font-size:13px;cursor:pointer">VOLVER</button>';if(mode==="athlete")c='<div style="margin-bottom:16px"><label class="lbl">Selecciona atleta</label><select class="inp" id="ath-sel" style="border-color:#D4A017;font-size:16px">';var app=document.getElementById("app");if(mode==="athlete"){ST.athletes.forEach(a=>{c+='<option value="'+a.id+'">'+esc(a.name)+'</option>';});c+='</select></div>'+c;}app.innerHTML='<div style="min-height:100vh;background:#070d1a;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px"><div style="font-size:50px;margin-bottom:20px;font-weight:900;color:#D4A017">CBA</div><div style="font-size:18px;font-weight:900;color:#fff;margin-bottom:24px">'+(mode==="coach"?tl.coachMode:tl.athMode)+'</div><div style="width:100%;max-width:320px">'+c+'</div></div>';}
+
+function pinInput(v){if(v==="")return;if(v==="⌫")_pinBuf=_pinBuf.slice(0,-1);else if(_pinBuf.length<4)_pinBuf+=String(v);document.querySelectorAll(".pin-dot").forEach((d,i)=>{d.classList.toggle("filled",i<_pinBuf.length);});if(_pinBuf.length===4)setTimeout(checkPin,150);}
+
+function checkPin(){var err=document.getElementById("pin-err");if(_pinMode==="coach"){if(_pinBuf===COACH_PIN){loginCoach();}else{if(err)err.textContent=t().wrongPin;_pinBuf="";document.querySelectorAll(".pin-dot").forEach(d=>d.classList.remove("filled"));}}else{var athSel=document.getElementById("ath-sel");var athId=athSel?athSel.value:ST.athletes[0]?.id;var ath=ST.athletes.find(a=>a.id===athId);if(ath&&_pinBuf===(ath.pin||"1234")){loginAthlete(ath);}else{if(err)err.textContent=t().wrongPin;_pinBuf="";document.querySelectorAll(".pin-dot").forEach(d=>d.classList.remove("filled"));}}}
+
+function loginCoach(){ST.isCoach=true;ST.user=null;sv("cba_session",{isCoach:true});launchApp();}
+function loginAthlete(ath){ST.isCoach=false;ST.user=ath;sv("cba_session",{isCoach:false,userId:ath.id});launchApp();}
+function launchApp(){document.getElementById("app").style.display="none";document.getElementById("main-shell").style.display="block";updateHdr();renderNav();goTab("home");}
+function logout(){sv("cba_session",null);ST.user=null;ST.isCoach=false;showLogin();}
+
+function confirmChangeUser(){var who=ST.isCoach?"COACH":ST.user?ST.user.name:"";var c='<div style="text-align:center"><div style="font-size:30px;margin-bottom:12px">⇄</div><div style="font-size:14px;font-weight:900;color:#e74c3c;margin-bottom:6px">CAMBIAR USUARIO</div><div style="font-size:12px;color:#7a9ab5;margin-bottom:20px">Actual: <span style="color:#D4A017;font-weight:700">'+esc(who)+'</span></div><div style="display:flex;flex-direction:column;gap:10px"><button onclick="logout()" style="width:100%;background:#8b1a1a;border:none;color:#fff;border-radius:10px;padding:14px;font-weight:900;cursor:pointer">SALIR Y CAMBIAR USUARIO</button><button onclick="closeM()" style="width:100%;background:#1e3050;border:none;color:#fff;border-radius:10px;padding:12px;cursor:pointer">CANCELAR</button></div></div>';document.getElementById("modal-wrap").innerHTML='<div class="modal-bg" style="z-index:999"><div class="modal-box" onclick="event.stopPropagation()" style="text-align:center">'+c+'</div></div>';}
+
+function init(){var a=ld("cba_athletes",[]);var f=ld("cba_fights",[]);ST.athletes=a.length>0?a:DA;ST.fights=f.length>0?f:DF;if(a.length===0)sv("cba_athletes",DA);if(f.length===0)sv("cba_fights",DF);ST.lang=ld("cba_lang","es")||"es";var sess=ld("cba_session",null);if(sess&&sess.isCoach){ST.isCoach=true;ST.user=null;launchApp();}else if(sess&&sess.userId){var ath=ST.athletes.find(a=>a.id===sess.userId);if(ath){ST.isCoach=false;ST.user=ath;launchApp();}else showLogin();}else{showLogin();}}
+
+window.addEventListener("DOMContentLoaded",init);
+</script>
+</body>
+</html>
