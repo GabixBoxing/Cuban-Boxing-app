@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#070d1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CBA Boxing">
+<title>Cuban Boxing App</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:#070d1a;color:#fff;font-family:-apple-system,Arial,sans-serif;min-height:100vh;overflow-x:hidden}
+#root{max-width:480px;margin:0 auto}
+button{cursor:pointer;font-family:inherit;transition:opacity .1s}
+button:active{opacity:.75;transform:scale(.97)}
+input,select,textarea{font-family:inherit}
+.page{display:none;padding:14px 14px 90px;min-height:100vh}
+.page.on{display:block}
+#hdr{background:linear-gradient(135deg,#0a1628,#0f1e35);border-bottom:2px solid #D4A017;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+#nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#0a1628;border-top:2px solid #D4A017;display:flex;z-index:50}
+.nb{flex:1;background:none;border:none;color:#4a6a8a;padding:8px 2px 6px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:8px;font-weight:700;letter-spacing:.5px}
+.nb.on{color:#D4A017}
+.nb .ic{font-size:19px;line-height:1}
+.card{background:#0f1e35;border-radius:12px;padding:14px;margin-bottom:10px;border:1px solid #1e3050}
+.gold{border-color:#D4A017}
+.btn{width:100%;border:none;border-radius:10px;padding:13px;font-weight:800;font-size:15px;cursor:pointer;letter-spacing:.5px}
+.btn-g{background:#D4A017;color:#000}
+.btn-d{background:#1e3050;color:#D4A017}
+.btn-gr{background:#1a6b3c;color:#fff}
+.btn-r{background:#8b1a1a;color:#fff}
+.inp{width:100%;background:#0f1e35;border:1.5px solid #1e3050;border-radius:8px;padding:11px 12px;color:#fff;font-size:14px;outline:none}
+.inp:focus{border-color:#D4A017}
+.sel{width:100%;background:#0f1e35;border:1.5px solid #1e3050;border-radius:8px;padding:11px 12px;color:#fff;font-size:14px;outline:none}
+.lbl{display:block;font-size:10px;font-weight:700;color:#7a9ab5;letter-spacing:.5px;margin-bottom:4px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.sh{display:flex;align-items:center;gap:8px;margin:16px 0 10px}
+.sh .st{font-size:11px;font-weight:700;color:#D4A017;letter-spacing:2px;white-space:nowrap}
+.sh .sl{flex:1;height:1px;background:#1e3050}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:200;display:flex;align-items:flex-end;justify-content:center}
+.modal-box{background:#0a1628;border-radius:20px 20px 0 0;padding:20px 16px 30px;width:100%;max-width:480px;max-height:92vh;overflow-y:auto;border:1px solid #1e3050}
+.pin-dot{width:14px;height:14px;border-radius:50%;background:#1e3050;border:2px solid #D4A017;transition:background .15s}
+.pin-dot.on{background:#D4A017}
+.pin-btn{background:#0f1e35;border:1px solid #1e3050;border-radius:12px;padding:16px;font-size:22px;font-weight:800;color:#fff}
+.pin-btn:active{background:#D4A017;color:#000}
+.prog{background:#1e3050;border-radius:4px;height:6px;overflow:hidden}
+.prog-fill{height:100%;background:#D4A017;border-radius:4px;transition:width .3s}
+.sc{display:inline-flex;align-items:center;gap:4px}
+.sc-dot{width:7px;height:7px;border-radius:50%;display:inline-block}
+.meal{background:#070d1a;border-radius:10px;padding:12px;margin-bottom:8px;border-left:3px solid #D4A017}
+</style>
+</head>
+<body>
+<div id="root">
+  <div id="login-screen"></div>
+  <div id="app-shell" style="display:none">
+    <div id="hdr">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div id="hdr-logo" style="width:40px;height:40px;flex-shrink:0"></div>
+        <div>
+          <div style="font-weight:900;font-size:13px;letter-spacing:1px;color:#fff">CUBAN BOXING</div>
+          <div id="hdr-user" style="font-size:9px;color:#D4A017;letter-spacing:1px">COACH</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <div id="hdr-date" style="font-size:9px;color:#7a9ab5;text-align:right;line-height:1.3"></div>
+        <button onclick="switchUser()" style="background:#8b1a1a;border:2px solid #e74c3c;color:#fff;border-radius:8px;padding:6px 10px;font-weight:900;font-size:12px">SALIR</button>
+      </div>
+    </div>
+    <div id="pages">
+      <div id="pg-home" class="page on"></div>
+      <div id="pg-athletes" class="page"></div>
+      <div id="pg-training" class="page"></div>
+      <div id="pg-fights" class="page"></div>
+      <div id="pg-tactics" class="page"></div>
+      <div id="pg-nutrition" class="page"></div>
+      <div id="pg-store" class="page"></div>
+      <div id="pg-notes" class="page"></div>
+    </div>
+    <div id="nav"></div>
+    <div id="modal"></div>
+  </div>
+</div>
+<script>
+// ─── UTILS ───────────────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const esc = s => String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const sv = (k,v) => { try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} };
+const ld = (k,d) => { try{const r=localStorage.getItem(k);return r!=null?JSON.parse(r):d;}catch(e){return d;} };
+const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const L = (es,en) => ST.lang==="es"?es:en;
+const fD = d => { if(!d)return"—"; try{return new Date(d).toLocaleDateString("es",{day:"2-digit",month:"short",year:"numeric"});}catch(e){return d;} };
+const age = d => { if(!d)return"—"; const b=new Date(d),t=new Date(); let a=t.getFullYear()-b.getFullYear(); if(t<new Date(t.getFullYear(),b.getMonth(),b.getDate()))a--; return a; };
+const ini = n => n.split(" ").slice(0,2).map(x=>x[0]||"").join("").toUpperCase();
+const AVC = ["#1a4a7a","#1a6b3c","#5b2c8d","#8b1a1a","#4a3a1a","#1a5a5a"];
+const avClr = n => AVC[n.charCodeAt(0)%AVC.length];
+const av = (name,sz) => `<div style="width:${sz}px;height:${sz}px;border-radius:${Math.round(sz*.22)}px;background:${avClr(name)};display:flex;align-items:center;justify-content:center;font-weight:900;font-size:${Math.round(sz*.35)}px;color:#fff;flex-shrink:0">${esc(ini(name))}</div>`;
+const sh = (t,i) => `<div class="sh"><span>${i}</span><span class="st">${t.toUpperCase()}</span><div class="sl"></div></div>`;
+const ec = m => `<div style="text-align:center;color:#4a6a8a;padding:30px;font-size:13px">${m}</div>`;
+const PC = {1:"#1a4a7a",2:"#1a6b3c",3:"#5b2c8d",4:"#8b1a1a",5:"#4a4a1a"};
+const pName = p => L(["","Prep General","Prep Específica","Automatismo","Pre-Competencia","Mantenimiento"][p]||"",["","General Prep","Specific Prep","Automatism","Pre-Competition","Maintenance"][p]||"");
+const badge = (p,w) => `<span style="background:${PC[p]||PC[1]};border-radius:6px;padding:2px 8px;font-size:11px;color:#fff;font-weight:700">${L("F","Ph")}${p} ${L("S","W")}${w}</span>`;
+const CATS = ["Youth (15-16)","Junior (17-18)","Elite Amateur","Intermediate (13-14)","Bantam (11-12)"];
+const GRPS = ["Grupo B (11-12)","Grupo C (13-14)","Mayores 16","Mayores 18"];
+const STATS = ["Activo","Lesionado","Recuperación","Fuera de temporada"];
+const STCLR = {"Activo":"#1a8f4c","Lesionado":"#c0392b","Recuperación":"#D4A017","Fuera de temporada":"#4a6a8a"};
+const WGTS = [105,108,112,115,119,122,126,130,132,135,140,147,154,160,168,175,200];
+function sdot(st){const c=STCLR[st]||"#7a9ab5";return`<span class="sc"><span class="sc-dot" style="background:${c}"></span><span style="font-size:10px;color:${c};font-weight:700">${esc(st||"").toUpperCase()}</span></span>`;}
+
+// ─── STATE ───────────────────────────────────────────────────────────────
+const ST = {lang:"es",tab:"home",isCoach:false,user:null,athletes:[],fights:[],openStyle:null,openPhase:null,openWeek:null,openDay:null,openNut:"n1",trainPick:null,trainDay:null};
+const COACH_PIN = "1967";
+const MSG_KEY = "cba_msg_";
+let _deferredPrompt = null;
+
+// ─── DEFAULT DATA ─────────────────────────────────────────────────────────
+const DA = [
+  {id:"a1",name:"Gabriel Rodriguez",dob:"2009-04-04",weight:132,category:"Youth (15-16)",group:"Mayores 16",phase:2,week:3,status:"Activo",notes:"",wins:1,losses:1,draws:0,pin:"1204"},
+  {id:"a2",name:"Marisol Mendoza",dob:"",weight:132,category:"Elite Amateur",group:"Mayores 16",phase:2,week:2,status:"Activo",notes:"Trabajar el jab constante",wins:0,losses:0,draws:0,pin:"0202"},
+  {id:"a3",name:"Naomy Lozano",dob:"",weight:114,category:"Elite Amateur",group:"Mayores 16",phase:1,week:1,status:"Activo",notes:"",wins:0,losses:0,draws:0,pin:"0303"},
+  {id:"a4",name:"Israel Jackson",dob:"",weight:132,category:"Youth (15-16)",group:"Mayores 16",phase:1,week:1,status:"Activo",notes:"",wins:0,losses:0,draws:0,pin:"0404"},
+  {id:"a5",name:"Izze",dob:"2013-05-06",weight:95,category:"Intermediate (13-14)",group:"Grupo C (13-14)",phase:1,week:7,status:"Activo",notes:"CAMPEONA 1 Mayo 2026",wins:1,losses:0,draws:0,pin:"0506"},
+  {id:"a6",name:"Fernando",dob:"",weight:300,category:"Elite Amateur",group:"Mayores 18",phase:1,week:1,status:"Activo",notes:"Dolor lumbar — sin saco",wins:0,losses:0,draws:0,pin:"0606"},
+];
+const DF = [
+  {id:"f1",athId:"a1",opp:"Por confirmar",date:"2026-07-25",result:"Próxima",wc:"132 lbs",event:"Mike Tyson Invitational 2",notes:""},
+  {id:"f2",athId:"a2",opp:"Por confirmar",date:"2026-07-25",result:"Próxima",wc:"132 lbs",event:"Mike Tyson Invitational 2",notes:""},
+  {id:"f3",athId:"a5",opp:"Rival Intermediate",date:"2026-05-01",result:"Victoria",wc:"Intermediate",event:"Nemea Fight Night",notes:"Primera victoria"},
+  {id:"f4",athId:"a1",opp:"Rival desconocido",date:"2026-05-01",result:"Derrota",wc:"145 lbs",event:"Nemea Fight Night",notes:"Decision injusta"},
+];
+
+// ─── STYLES DATA ──────────────────────────────────────────────────────────
+const STYLES=[
+  {color:"#5b2c8d",name:"Presionador Frontal",desc:"Avanza constantemente — esquinas — quita la distancia",danger:"Si retrocedes en línea recta te acorrala",tell:"Hombros hundiéndose — rodillas flexionan antes de avanzar",planA:"Jab control + retroceso lateral + pivote 45° + contragolpe + salida",planB:"Cerrar distancia + ráfaga corta 4-6 golpes adentro + salida lateral",pts:["Jab constante — yo controlo la distancia","Retroceso LATERAL + pivote — NUNCA en línea recta","Después del pivote — contragolpe + salida"],r1:"Usar jab para medir — identificar la señal del avance",r2:"Plan A confirmado — retroceso lateral automático",r3:"Si cansado — contrapresión — si no — mantener Plan A"},
+  {color:"#8b1a1a",name:"Buscador del Cuerpo",desc:"Entra agachado — golpea al hígado y plexo solar",danger:"Los golpes al cuerpo acumulan — si llegan muchos el cuerpo se cierra",tell:"Ojos bajando hacia el cuerpo — rodillas flexionan más de lo normal",planA:"Jab desde arriba + rotación de cadera + gancho arriba cuando baja cabeza + salida",planB:"Cerrar distancia + clinch defensivo + salida",pts:["Cuando la cabeza baja — gancho desde arriba","Rotación activa de cadera — cintura en el impacto","Salida lateral siempre"],r1:"Identificar señal cuando va al cuerpo — preparar gancho arriba",r2:"Gancho desde arriba cuando baja la cabeza — si funciona repetir",r3:"Si lastimamos arriba — va menos al cuerpo"},
+  {color:"#1a4a7a",name:"Contragolpeador",desc:"Espera el ataque — pega en la entrada — muy paciente",danger:"Si atacas en línea recta tiene tu contragolpe esperando",tell:"Peso en pie trasero — guardia alta cerrada — ojos fijos",planA:"Falsa entrada + esperar reacción + entrar DESPUÉS de que lance",planB:"Jab constante para romper concentración + cambio de ritmo",pts:["Falsa entrada primero — ver cómo reacciona","Entrar DESPUÉS de que lance — nunca al mismo tiempo","Cambiar el ritmo — rápido y lento"],r1:"Testear con falsas entradas — ver su respuesta preferida",r2:"Usar su respuesta para predecirla y contrarrestarla",r3:"Más presión — si cansado pierde velocidad de reacción"},
+  {color:"#2c5f7a",name:"Rival Zurdo",desc:"El cruzado zurdo llega desde ángulo inesperado",danger:"El cruzado zurdo llega exactamente donde no esperas",tell:"Hombro derecho sube ligeramente antes del cruzado",planA:"Jab + paso a la DERECHA + cruzado pasa por afuera + combinación desde el ángulo",planB:"Cerrar distancia + trabajo adentro — el cruzado pierde potencia",pts:["Paso a la derecha SIEMPRE — el cruzado pasa por afuera","Combinación desde el ángulo derecho","NUNCA en línea recta"],r1:"Confirmar el paso a la derecha — ver que el cruzado pasa afuera",r2:"Combinar desde el ángulo — se desorienta cuando el cruzado falla",r3:"Si dominamos desde el ángulo — más confianza"},
+  {color:"#1a6b3c",name:"Alto con Jab Largo",desc:"Controla la distancia con jab largo — domina desde lejos",danger:"Si respetas su distancia dominan toda la pelea",tell:"El peso se mueve hacia atrás antes del jab — listo para escapar",planA:"Esquivar el jab (cabeza afuera) + cerrar distancia + combinación adentro",planB:"Propio jab para medir + falsa entrada + cerrar cuando reacciona",pts:["No respetar su distancia — cerrar activamente","Esquivar el jab — cabeza afuera — nunca absorber","Salida lateral después de la combinación"],r1:"Medir el jab — ver velocidad y timing — preparar el esquive",r2:"Esquivar + cerrar — si funciona pierde su arma principal",r3:"Si cerramos bien — se frustra — más presión adentro"},
+  {color:"#5a3a1a",name:"Buscador de Combinaciones",desc:"Lanza combinaciones largas de 4-8 golpes — abruma con volumen",danger:"Si no te mueves las combinaciones acumulan daño",tell:"Respiración corta antes de la combinación — peso centra para estabilidad",planA:"Movimiento lateral constante + desviar primer golpe + entrar DURANTE la combo (golpe 3-4)",planB:"Esperar el final de la combinación + contragolpe en el punto ciego",pts:["Movimiento lateral constante — nunca quieto","Entrar cuando lleva 3-4 golpes — su punto más débil","Salida lateral siempre"],r1:"Ver cuántos golpes tiene su combo — identificar el punto débil",r2:"Contragolpe en el punto débil — los sorprende",r3:"Acostumbrado a ese contragolpe — empiezan a dudar antes de combinar"},
+  {color:"#2a4a6a",name:"Defensivo / Evasivo",desc:"Siempre en movimiento — difícil de pegar — espera tu error",danger:"Si lo persigues sin plan gastas energía y espera tu error",tell:"Siempre en las puntas de los pies — ojos activos",planA:"Cortar el ring (ángulos no línea recta) + jab presión + forzar la esquina",planB:"Jab constante para marcar + seguir sin perseguir + combo cuando se detiene",pts:["Cortar el ring — ángulos — no perseguir en línea recta","Jab constante para obligarlo a parar","Combo cuando para o llega a la esquina"],r1:"Aprender su movimiento — qué lado se mueve más — cortar ese lado",r2:"Forzar la esquina — una vez cortado la pelea cambia",r3:"Si cansado — la evasión baja — presión final"},
+];
+
+// ─── NUTRITION DATA ───────────────────────────────────────────────────────
+const NUT_PHASES=[
+  {id:"n1",color:"#1a6b3c",icon:"💪",title:"8 SEMANAS — BASE",weeks:"Sem -8 a -5",
+   meals:[
+    {t:"DESAYUNO 7:00 AM",items:["2 huevos revueltos con espinaca","1 taza avena + plátano","Jugo naranja natural","Agua: 500ml"],cal:"550-600 kcal",mac:"Carbs: 65g | Prot: 32g | Grasa: 12g"},
+    {t:"MERIENDA 10:00 AM",items:["1 manzana","30g almendras","1 yogur griego sin azúcar"],cal:"280 kcal",mac:"Carbs: 28g | Prot: 15g | Grasa: 12g"},
+    {t:"ALMUERZO 1:00 PM",items:["180g pollo a la plancha","1 taza arroz integral","Ensalada: pepino, tomate, zanahoria","Agua: 500ml"],cal:"620 kcal",mac:"Carbs: 72g | Prot: 48g | Grasa: 12g"},
+    {t:"PRE-ENTRENO (2 hrs antes)",items:["1 banana","30g avena con agua","Agua: 400ml"],cal:"280 kcal",mac:"Carbs: 58g | Prot: 8g | Grasa: 2g"},
+    {t:"POST-ENTRENO (30 min)",items:["30g proteína whey + 1 banana + 250ml leche","Agua: 500ml"],cal:"380 kcal",mac:"Carbs: 55g | Prot: 38g | Grasa: 5g"},
+    {t:"CENA 7:00 PM",items:["200g salmón o atún a la plancha","2 tazas brócoli + coliflor vapor","1 camote mediano","Agua: 500ml"],cal:"480 kcal",mac:"Carbs: 42g | Prot: 52g | Grasa: 10g"},
+   ],total:"2590-2640 kcal/día",nota:"HIDRATACIÓN: 3-4L agua/día. Sin bebidas azucaradas."},
+  {id:"n2",color:"#D4A017",icon:"⚖️",title:"4 SEMANAS — CORTE",weeks:"Sem -4 a -2",
+   meals:[
+    {t:"DESAYUNO",items:["3 claras + 1 huevo entero","½ taza avena con canela sin azúcar","½ taza arándanos","Agua: 500ml"],cal:"420 kcal",mac:"Carbs: 42g | Prot: 30g | Grasa: 8g"},
+    {t:"MERIENDA 10:00 AM",items:["20g proteína whey con agua","1 manzana pequeña"],cal:"190 kcal",mac:"Carbs: 20g | Prot: 22g | Grasa: 2g"},
+    {t:"ALMUERZO",items:["200g pechuga pollo hervida","½ taza arroz integral","Ensalada solo limón sin aderezo","Agua: 500ml"],cal:"480 kcal",mac:"Carbs: 38g | Prot: 52g | Grasa: 6g"},
+    {t:"PRE-ENTRENO (90 min)",items:["1 banana mediana","Agua: 400ml"],cal:"105 kcal",mac:"Carbs: 27g | Prot: 1g | Grasa: 0g"},
+    {t:"POST-ENTRENO (20 min)",items:["30g proteína whey con agua fría","Agua: 600ml"],cal:"120 kcal",mac:"Carbs: 3g | Prot: 30g | Grasa: 1g"},
+    {t:"CENA LIGERA",items:["150g atún en agua escurrido","2 tazas vegetales verdes vapor","½ aguacate","Agua: 500ml"],cal:"320 kcal",mac:"Carbs: 18g | Prot: 38g | Grasa: 10g"},
+   ],total:"1635-1700 kcal/día",nota:"ELIMINAR: sodio, harinas blancas, azúcar, frituras, alcohol."},
+  {id:"n3",color:"#c0392b",icon:"🎯",title:"1 SEMANA — CORTE ACTIVO",weeks:"7 días antes",
+   meals:[
+    {t:"DESAYUNO DÍAS -7 A -4",items:["4 claras huevo hervidas","½ taza avena con agua sin sal","Té verde sin azúcar","Agua: 300ml"],cal:"280 kcal",mac:"Carbs: 28g | Prot: 26g | Grasa: 2g"},
+    {t:"MERIENDA",items:["20g proteína whey con agua","Pepino en rodajas sin sal"],cal:"120 kcal",mac:"Carbs: 8g | Prot: 22g | Grasa: 1g"},
+    {t:"ALMUERZO",items:["150g pollo plancha SIN SAL","1 taza arroz blanco (solo días -7 a -5)","Ensalada: lechuga, pepino, limón","Agua: 400ml"],cal:"380 kcal",mac:"Carbs: 35g | Prot: 40g | Grasa: 5g"},
+    {t:"PRE-ENTRENO",items:["½ banana","Agua: 300ml"],cal:"55 kcal",mac:"Carbs: 14g"},
+    {t:"POST-ENTRENO",items:["25g proteína whey con agua","Agua: 400ml"],cal:"100 kcal",mac:"Carbs: 3g | Prot: 25g | Grasa: 1g"},
+    {t:"CENA LIGERA",items:["100g atún en agua","Ensalada espinaca con limón","Agua: 300ml"],cal:"180 kcal",mac:"Carbs: 8g | Prot: 28g | Grasa: 3g"},
+   ],total:"1115-1200 kcal/día",nota:"⚠ SODIO MÍNIMO. Agua: 2L días -7 a -4, luego reducir. Consultar coach diariamente."},
+  {id:"n4",color:"#5b2c8d",icon:"⚡",title:"DÍA PESAJE — REPOSICIÓN",weeks:"Día del pesaje",
+   meals:[
+    {t:"MAÑANA DEL PESAJE",items:["Solo agua pequeños sorbos si falta menos de 1lb","Nada sólido si la diferencia es mayor a 1lb"],cal:"0-50 kcal",mac:"Solo si necesario"},
+    {t:"INMEDIATO POST-PESAJE (30 min)",items:["1L Gatorade o Pedialyte","2 bananas","2 rebanadas pan blanco con miel","Agua: 500ml"],cal:"580 kcal",mac:"Carbs: 120g | Prot: 8g | Grasa: 2g"},
+    {t:"2 HORAS POST-PESAJE",items:["200g arroz blanco","150g pollo hervido","1 banana","500ml Gatorade","Agua: 500ml"],cal:"680 kcal",mac:"Carbs: 110g | Prot: 40g | Grasa: 5g"},
+    {t:"6 HORAS POST-PESAJE",items:["30g proteína whey","1 taza arroz","Fruta de temporada","Agua: 500ml"],cal:"480 kcal",mac:"Carbs: 72g | Prot: 38g | Grasa: 4g"},
+    {t:"CENA — NOCHE ANTES DE PELEA",items:["200g pasta o arroz blanco","100g pollo a la plancha","Salsa de tomate simple","Agua: 500ml — SIN gaseosas"],cal:"620 kcal",mac:"Carbs: 98g | Prot: 36g | Grasa: 6g"},
+   ],total:"2520 kcal — RECARGA ACTIVA",nota:"OBJETIVO: recuperar glucógeno y líquidos. Evitar alimentos nuevos, grasosos o muy condimentados."},
+  {id:"n5",color:"#1a4a7a",icon:"🥊",title:"DÍA DE PELEA",weeks:"El combate",
+   meals:[
+    {t:"DESAYUNO (3-4 hrs antes)",items:["200g arroz blanco con miel","2 huevos revueltos","1 banana","Té o café sin azúcar (si acostumbrado)","Agua: 500ml"],cal:"580 kcal",mac:"Carbs: 90g | Prot: 24g | Grasa: 8g"},
+    {t:"2 HORAS ANTES",items:["1 banana","1 gel energía (si se usa habitualmente)","Agua: 300ml"],cal:"150 kcal",mac:"Carbs: 38g"},
+    {t:"1 HORA ANTES",items:["Agua con pizca de sal y azúcar (200ml)","Si nervioso: solo líquidos"],cal:"30 kcal",mac:"Solo electrolitos"},
+    {t:"ENTRE ASALTOS",items:["Pequeños sorbos Gatorade","Trozo naranja o banana entre asaltos"],cal:"60-80 kcal",mac:"Carbohidratos rápidos"},
+    {t:"INMEDIATO POST-PELEA",items:["30g proteína whey con agua o leche","1 banana","Agua: 500ml — REHIDRATACIÓN inmediata"],cal:"280 kcal",mac:"Carbs: 42g | Prot: 32g | Grasa: 3g"},
+    {t:"CENA POST-PELEA",items:["Comida que te guste — NO es momento de dieta","Énfasis proteína + carbohidratos","Dormir bien — la recuperación es esta noche"],cal:"Libre",mac:"Recuperación total"},
+   ],total:"1100-1200 kcal antes de pelea",nota:"⚠ NO comer nada nuevo. Solo lo que el cuerpo conoce. HIDRATACIÓN constante."},
+];
+
+// ─── PWA ─────────────────────────────────────────────────────────────────
+window.addEventListener("beforeinstallprompt", e => {
+  e.preventDefault();
+  _deferredPrompt = e;
+});
+
+function makeLogo(sz){
+  const c=document.createElement("canvas");c.width=c.height=sz;
+  const ctx=c.getContext("2d");
+  const r=sz*.18;
+  ctx.beginPath();ctx.moveTo(r,0);ctx.lineTo(sz-r,0);ctx.quadraticCurveTo(sz,0,sz,r);
+  ctx.lineTo(sz,sz-r);ctx.quadraticCurveTo(sz,sz,sz-r,sz);
+  ctx.lineTo(r,sz);ctx.quadraticCurveTo(0,sz,0,sz-r);
+  ctx.lineTo(0,r);ctx.quadraticCurveTo(0,0,r,0);ctx.closePath();
+  ctx.fillStyle="#0d1f3c";ctx.fill();
+  ctx.strokeStyle="#D4A017";ctx.lineWidth=sz*.055;ctx.stroke();
+  ctx.fillStyle="#D4A017";ctx.textAlign="center";ctx.textBaseline="middle";
+  ctx.font=`900 ${Math.floor(sz*.3)}px Arial Black,Arial`;ctx.fillText("CBA",sz/2,sz*.38);
+  ctx.fillStyle="#fff";ctx.font=`700 ${Math.floor(sz*.13)}px Arial`;ctx.fillText("BOXING",sz/2,sz*.62);
+  ctx.fillStyle="#4a8aff";ctx.font=`700 ${Math.floor(sz*.11)}px Arial`;ctx.fillText("OSVIMER",sz/2,sz*.79);
+  return c.toDataURL("image/png");
+}
+
+function injectPWA(){
+  const icon192=makeLogo(192);const icon512=makeLogo(512);
+  const li=document.createElement("link");li.rel="icon";li.type="image/png";li.href=icon192;document.head.appendChild(li);
+  const la=document.createElement("link");la.rel="apple-touch-icon";la.href=icon192;document.head.appendChild(la);
+  const manifest={name:"Cuban Boxing App",short_name:"CBA Boxing",description:"Metodología Sagarra — Coach Osvimer",start_url:"./",scope:"./",display:"standalone",background_color:"#070d1a",theme_color:"#D4A017",orientation:"portrait-primary",icons:[{src:icon192,sizes:"192x192",type:"image/png",purpose:"any maskable"},{src:icon512,sizes:"512x512",type:"image/png",purpose:"any maskable"}]};
+  const blob=new Blob([JSON.stringify(manifest)],{type:"application/manifest+json"});
+  const lm=document.createElement("link");lm.rel="manifest";lm.href=URL.createObjectURL(blob);document.head.appendChild(lm);
+}
+
+// ─── LOGIN ────────────────────────────────────────────────────────────────
+let _pin="",_mode="",_selAth=null;
+
+function showLogin(){
+  $("app-shell").style.display="none";
+  $("login-screen").style.display="block";
+  $("login-screen").innerHTML=buildLoginHome();
+}
+
+function buildLoginHome(){
+  return `<div style="min-height:100vh;background:#070d1a;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px">
+    <canvas id="logo-canvas" width="100" height="100" style="border-radius:18px;margin-bottom:16px"></canvas>
+    <div style="font-weight:900;font-size:28px;letter-spacing:3px;color:#fff;margin-bottom:4px">CUBAN BOXING</div>
+    <div style="font-size:12px;color:#D4A017;letter-spacing:2px;font-weight:700;margin-bottom:32px">COACH OSVIMER RODRIGUEZ</div>
+    <div style="width:100%;max-width:320px;display:flex;flex-direction:column;gap:12px">
+      <button onclick="startPin('coach')" class="btn btn-g" style="padding:17px;font-size:16px">🏋️ SOY COACH</button>
+      <button onclick="startPin('athlete')" class="btn btn-d" style="padding:17px;font-size:16px">👤 SOY ATLETA</button>
+      ${_deferredPrompt?`<button onclick="installApp()" class="btn btn-gr" style="padding:14px;font-size:14px">📲 INSTALAR COMO APP</button>`:""}
+      <button onclick="ST.lang=ST.lang==='es'?'en':'es';sv('cba_lang',ST.lang);showLogin()" style="background:none;border:1px solid #D4A017;color:#D4A017;border-radius:10px;padding:10px;font-weight:700;font-size:13px">${ST.lang==="es"?"🇺🇸 ENGLISH":"🇪🇸 ESPAÑOL"}</button>
+    </div>
+    <div style="font-size:10px;color:#4a6a8a;margin-top:24px;text-align:center">Basado en Metodología Sagarra — 30+ años</div>
+  </div>`;
+}
+
+function startPin(mode){
+  _mode=mode;_pin="";_selAth=null;
+  let html=`<div style="min-height:100vh;background:#070d1a;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px">`;
+  html+=`<div style="font-size:18px;font-weight:900;color:#D4A017;margin-bottom:24px">${mode==="coach"?L("🏋️ MODO COACH","🏋️ COACH MODE"):L("👤 MODO ATLETA","👤 ATHLETE MODE")}</div>`;
+  if(mode==="athlete"){
+    html+=`<div style="width:100%;max-width:320px;margin-bottom:16px">`;
+    html+=`<label class="lbl" style="text-align:center;display:block;font-size:13px;margin-bottom:8px">${L("Selecciona tu nombre:","Select your name:")}</label>`;
+    html+=`<select class="sel" id="ath-sel" style="border-color:#D4A017;font-size:15px">`;
+    ST.athletes.forEach(a=>{html+=`<option value="${a.id}">${esc(a.name)}</option>`;});
+    html+=`</select></div>`;
+  }
+  html+=`<div style="width:100%;max-width:280px">`;
+  html+=`<div style="font-size:13px;color:#7a9ab5;text-align:center;margin-bottom:12px">${L("Ingresa tu PIN (4 dígitos)","Enter your PIN (4 digits)")}</div>`;
+  html+=`<div style="display:flex;justify-content:center;gap:10px;margin-bottom:20px" id="pin-dots">`;
+  html+=`<div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>`;
+  html+=`</div>`;
+  html+=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">`;
+  [1,2,3,4,5,6,7,8,9].forEach(n=>{html+=`<button class="pin-btn" onclick="addPin(${n})">${n}</button>`;});
+  html+=`<button class="pin-btn" onclick="clearPin()" style="font-size:14px">⌫</button>`;
+  html+=`<button class="pin-btn" onclick="addPin(0)">0</button>`;
+  html+=`<button class="pin-btn" style="font-size:12px;color:#c0392b" onclick="showLogin()">✕</button>`;
+  html+=`</div>`;
+  html+=`<div id="pin-err" style="text-align:center;color:#c0392b;font-size:13px;min-height:20px"></div>`;
+  html+=`</div></div>`;
+  $("login-screen").innerHTML=html;
+  // Draw logo in pin screen
+  setTimeout(()=>{},50);
+}
+
+function addPin(n){
+  if(_pin.length>=4)return;
+  _pin+=String(n);
+  updatePinDots();
+  if(_pin.length===4)setTimeout(checkPin,200);
+}
+
+function clearPin(){_pin=_pin.slice(0,-1);updatePinDots();}
+
+function updatePinDots(){
+  const dots=document.querySelectorAll(".pin-dot");
+  dots.forEach((d,i)=>d.classList.toggle("on",i<_pin.length));
+}
+
+function checkPin(){
+  const err=$("pin-err");
+  if(_mode==="coach"){
+    if(_pin===COACH_PIN){loginCoach();}
+    else{if(err)err.textContent=L("PIN incorrecto — intenta de nuevo","Wrong PIN — try again");_pin="";updatePinDots();}
+  } else {
+    const sel=$("ath-sel");
+    const athId=sel?sel.value:(ST.athletes[0]?.id||"");
+    const ath=ST.athletes.find(a=>a.id===athId);
+    if(ath&&_pin===(ath.pin||"1234")){loginAthlete(ath);}
+    else{if(err)err.textContent=L("PIN incorrecto — intenta de nuevo","Wrong PIN — try again");_pin="";updatePinDots();}
+  }
+}
+
+function loginCoach(){
+  ST.isCoach=true;ST.user=null;
+  launchApp();
+}
+
+function loginAthlete(ath){
+  ST.isCoach=false;ST.user=ath;
+  launchApp();
+}
+
+function switchUser(){
+  showModal(`<div style="text-align:center">
+    <div style="font-size:36px;margin-bottom:12px">⇄</div>
+    <div style="font-size:18px;font-weight:900;color:#e74c3c;margin-bottom:6px">${L("CAMBIAR USUARIO","SWITCH USER")}</div>
+    <div style="font-size:13px;color:#7a9ab5;margin-bottom:20px">${L("Sesión:","Session:")} <span style="color:#D4A017;font-weight:700">${esc(ST.isCoach?"COACH":ST.user?.name||"")}</span></div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <button onclick="doLogout()" class="btn btn-r">${L("🔓 SALIR Y CAMBIAR","🔓 EXIT & SWITCH")}</button>
+      <button onclick="closeModal()" class="btn btn-d">${L("← CANCELAR","← CANCEL")}</button>
+    </div>
+  </div>`);
+}
+
+function doLogout(){ST.user=null;ST.isCoach=false;closeModal();showLogin();}
+
+function installApp(){
+  if(_deferredPrompt){_deferredPrompt.prompt();_deferredPrompt.userChoice.then(()=>{_deferredPrompt=null;});} 
+}
+
+function launchApp(){
+  $("login-screen").style.display="none";
+  $("app-shell").style.display="block";
+  const hdrUser=$("hdr-user");
+  if(hdrUser)hdrUser.textContent=ST.isCoach?"COACH":ST.user?.name||"";
+  const hdrDate=$("hdr-date");
+  if(hdrDate){const d=new Date();hdrDate.innerHTML=d.toLocaleDateString("es",{weekday:"short",day:"2-digit",month:"short"}).toUpperCase();}
+  const hdrLogo=$("hdr-logo");
+  if(hdrLogo)hdrLogo.innerHTML=`<canvas id="hdr-logo-canvas" width="40" height="40" style="border-radius:8px"></canvas>`;
+  setTimeout(()=>{const c=$("hdr-logo-canvas");if(c){const ctx=c.getContext("2d");const img=new Image();img.onload=()=>ctx.drawImage(img,0,0,40,40);img.src=makeLogo(40);}},50);
+  buildNav();
+  goTab("home");
+}
+
+// ─── NAV ─────────────────────────────────────────────────────────────────
+const TABS=[{id:"home",ic:"🏠",lb:"INICIO"},{id:"athletes",ic:"👤",lb:"ATLETAS"},{id:"training",ic:"📋",lb:"ENTRENO"},{id:"fights",ic:"🏆",lb:"PELEAS"},{id:"tactics",ic:"🎯",lb:"TÁCTICAS"},{id:"nutrition",ic:"🥗",lb:"NUTRICIÓN"},{id:"store",ic:"🛒",lb:"TIENDA"},{id:"notes",ic:"💬",lb:"NOTAS"}];
+
+function buildNav(){
+  $("nav").innerHTML=TABS.map(t=>`<button class="nb${ST.tab===t.id?" on":""}" onclick="goTab('${t.id}')"><span class="ic">${t.ic}</span>${t.lb}</button>`).join("");
+}
+
+function goTab(tab){
+  ST.tab=tab;
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("on"));
+  const pg=$("pg-"+tab);if(pg)pg.classList.add("on");
+  buildNav();
+  renderTab(tab);
+}
+
+function renderTab(tab){
+  const el=$("pg-"+tab);if(!el)return;
+  const r={home:renderHome,athletes:renderAthletes,training:renderTraining,fights:renderFights,tactics:renderTactics,nutrition:renderNutrition,store:renderStore,notes:renderNotes};
+  if(r[tab])el.innerHTML=r[tab]();
+}
+
+function reRender(){renderTab(ST.tab);}
+
+// ─── MODAL ───────────────────────────────────────────────────────────────
+function showModal(html){
+  $("modal").innerHTML=`<div class="modal-bg" onclick="bgClose(event)"><div class="modal-box" onclick="event.stopPropagation()">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:14px"><button onclick="closeModal()" style="background:#e74c3c;border:none;color:#fff;border-radius:50%;width:34px;height:34px;font-size:16px;font-weight:900;cursor:pointer">✕</button></div>
+    ${html}</div></div>`;
+}
+function closeModal(){$("modal").innerHTML="";}
+function bgClose(e){if(e.target.classList.contains("modal-bg"))closeModal();}
+function gv(id){const e=$(id);return e?e.value:"";}
+
+// ─── HOME ─────────────────────────────────────────────────────────────────
+function renderHome(){
+  let h="";
+  if(ST.isCoach){
+    const active=ST.athletes.filter(a=>a.status==="Activo").length;
+    const upcoming=ST.fights.filter(f=>f.date&&new Date(f.date)>=new Date()).length;
+    h+=`<div class="g3" style="margin-bottom:14px">`;
+    h+=`<div style="background:#1a4a7a;border-radius:10px;padding:12px;text-align:center"><div style="font-size:30px;font-weight:900;color:#fff">${ST.athletes.length}</div><div style="font-size:9px;color:rgba(255,255,255,.7)">ATLETAS</div></div>`;
+    h+=`<div style="background:#1a6b3c;border-radius:10px;padding:12px;text-align:center"><div style="font-size:30px;font-weight:900;color:#fff">${active}</div><div style="font-size:9px;color:rgba(255,255,255,.7)">ACTIVOS</div></div>`;
+    h+=`<div style="background:#8b1a1a;border-radius:10px;padding:12px;text-align:center"><div style="font-size:30px;font-weight:900;color:#fff">${upcoming}</div><div style="font-size:9px;color:rgba(255,255,255,.7)">PELEAS</div></div>`;
+    h+=`</div>`;
+    h+=sh("ACCIONES RÁPIDAS","⚡");
+    h+=`<div class="g2" style="margin-bottom:8px"><button onclick="openAddAthlete()" class="btn btn-g">+ ATLETA</button><button onclick="openAddFight()" class="btn btn-d">+ PELEA</button></div>`;
+    const ups=ST.fights.filter(f=>f.date&&new Date(f.date)>=new Date()).sort((a,b)=>new Date(a.date)-new Date(b.date)).slice(0,3);
+    if(ups.length){h+=sh("PRÓXIMAS PELEAS","🏆");ups.forEach(f=>{const a=ST.athletes.find(x=>x.id===f.athId);h+=`<div class="card gold" style="margin-bottom:8px"><div style="font-weight:800;color:#fff">${esc(a?a.name:"—")}</div><div style="font-size:12px;color:#D4A017">${esc(f.event||"")} • ${fD(f.date)}</div></div>`;});}
+    h+=`<button onclick="switchUser()" style="width:100%;background:none;border:2px solid #8b1a1a;color:#e74c3c;border-radius:10px;padding:12px;font-weight:700;font-size:13px;margin-top:8px;cursor:pointer">⇄ CAMBIAR / SALIR</button>`;
+  } else {
+    const ath=ST.user;if(!ath)return"";
+    h+=`<div class="card gold" style="margin-bottom:14px">`;
+    h+=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">`;
+    h+=av(ath.name,52);
+    h+=`<div style="flex:1;margin-left:12px"><div style="font-size:20px;font-weight:900;color:#fff">${esc(ath.name)}</div><div style="font-size:11px;color:#7a9ab5">${esc(ath.category||"")} • ${ath.weight||"—"} lb</div></div>`;
+    h+=badge(ath.phase,ath.week);h+=`</div>`;
+    h+=`<div class="g3"><div style="text-align:center"><div style="font-size:28px;font-weight:900;color:#1a8f4c">${ath.wins||0}</div><div style="font-size:9px;color:#7a9ab5">VICTORIAS</div></div><div style="text-align:center"><div style="font-size:28px;font-weight:900;color:#c0392b">${ath.losses||0}</div><div style="font-size:9px;color:#7a9ab5">DERROTAS</div></div><div style="text-align:center"><div style="font-size:28px;font-weight:900;color:#7a9ab5">${ath.draws||0}</div><div style="font-size:9px;color:#7a9ab5">EMPATES</div></div></div></div>`;
+    h+=sh("HOY","📋");
+    const today=new Date().getDay();
+    const DAYS=["DOM","LUN","MAR","MIÉ","JUE","VIE","SÁB"];
+    h+=`<div class="card" style="margin-bottom:14px"><div style="font-size:13px;color:#D4A017;font-weight:700;margin-bottom:8px">${DAYS[today]}</div>`;
+    h+=`<div style="font-size:14px;color:#fff">${L("Ver plan completo en ENTRENO","See full plan in TRAINING")}</div><button onclick="goTab('training')" class="btn btn-g" style="margin-top:10px">VER ENTRENAMIENTO</button></div>`;
+    h+=`<div style="display:flex;flex-direction:column;gap:8px">`;
+    h+=`<button onclick="goTab('nutrition')" class="btn btn-gr">🥗 PLAN NUTRICIONAL</button>`;
+    h+=`<button onclick="goTab('notes')" class="btn btn-d">💬 MIS NOTAS</button>`;
+    h+=`<button onclick="switchUser()" style="width:100%;background:none;border:2px solid #8b1a1a;color:#e74c3c;border-radius:10px;padding:12px;font-weight:700;font-size:13px;cursor:pointer">⇄ CAMBIAR DE USUARIO</button>`;
+    h+=`</div>`;
+  }
+  return h;
+}
+
+// ─── ATHLETES ─────────────────────────────────────────────────────────────
+function renderAthletes(){
+  if(!ST.isCoach)return ec(L("Solo para el Coach","Coach only"));
+  let h=`<button onclick="openAddAthlete()" class="btn btn-g" style="margin-bottom:14px">+ REGISTRAR ATLETA NUEVO</button>`;
+  if(!ST.athletes.length)return h+ec(L("Sin atletas registrados","No athletes registered"));
+  ST.athletes.forEach(a=>{
+    const msgs=ld(MSG_KEY+a.id,[]);
+    const unread=msgs.filter(m=>m.from==="athlete"&&!m.read).length;
+    h+=`<div class="card" style="cursor:pointer;display:flex;gap:12px;align-items:center" onclick="openEditAthlete('${a.id}')">`;
+    h+=av(a.name,50);
+    h+=`<div style="flex:1;min-width:0"><div style="font-weight:800;font-size:16px;color:#fff">${esc(a.name)}</div>`;
+    h+=`<div style="font-size:11px;color:#7a9ab5;margin-top:2px">${age(a.dob)} años • ${a.weight||"—"} lb • ${sdot(a.status||"Activo")}</div>`;
+    h+=`<div style="margin-top:6px;display:flex;gap:6px;align-items:center">${badge(a.phase,a.week)}${unread>0?`<span style="background:#c0392b;color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700">${unread} msg</span>`:""}</div></div>`;
+    h+=`<div style="text-align:right;flex-shrink:0"><div style="font-size:11px;color:#D4A017;font-weight:700">${esc(a.category||"")}</div><div style="font-size:12px;margin-top:4px"><span style="color:#1a8f4c">${a.wins||0}W</span> <span style="color:#c0392b">${a.losses||0}L</span> <span style="color:#7a9ab5">${a.draws||0}D</span></div></div>`;
+    h+=`</div>`;
+  });
+  return h;
+}
+
+function openAddAthlete(){
+  const h=buildAthleteForm(null);
+  showModal(h);
+}
+
+function openEditAthlete(id){
+  const a=ST.athletes.find(x=>x.id===id);if(!a)return;
+  const h=buildAthleteForm(a);
+  showModal(h);
+}
+
+function buildAthleteForm(a){
+  const isEdit=!!a;
+  const v=(field,def="")=>a?esc(a[field]||def):def;
+  let h=`<div style="font-size:19px;font-weight:900;color:#D4A017;margin-bottom:16px">${isEdit?L("EDITAR ATLETA","EDIT ATHLETE"):L("NUEVO ATLETA","NEW ATHLETE")}</div>`;
+  h+=`<div style="margin-bottom:10px"><label class="lbl">NOMBRE *</label><input class="inp" id="f-name" placeholder="${L("Nombre completo","Full name")}" value="${v("name")}"></div>`;
+  h+=`<div style="margin-bottom:10px"><label class="lbl">FECHA NACIMIENTO</label><input type="date" class="inp" id="f-dob" value="${v("dob")}"></div>`;
+  h+=`<div class="g2" style="margin-bottom:10px"><div><label class="lbl">PESO lb *</label><input type="number" class="inp" id="f-wt" value="${v("weight")}" placeholder="132"></div><div><label class="lbl">PIN (4 dígitos) *</label><input type="text" class="inp" id="f-pin" value="${v("pin","1234")}" maxlength="4" placeholder="1234"></div></div>`;
+  h+=`<div style="margin-bottom:10px"><label class="lbl">CATEGORÍA</label><select class="sel" id="f-cat">${CATS.map(c=>`<option value="${c}"${a&&a.category===c?" selected":""}>${c}</option>`).join("")}</select></div>`;
+  h+=`<div style="margin-bottom:10px"><label class="lbl">GRUPO</label><select class="sel" id="f-grp">${GRPS.map(g=>`<option value="${g}"${a&&a.group===g?" selected":""}>${g}</option>`).join("")}</select></div>`;
+  h+=`<div style="margin-bottom:10px"><label class="lbl">ESTADO</label><select class="sel" id="f-st">${STATS.map(s=>`<option value="${s}"${a&&a.status===s?" selected":""}>${s}</option>`).join("")}</select></div>`;
+  h+=`<div class="g3" style="margin-bottom:10px"><div><label class="lbl">FASE</label><select class="sel" id="f-ph">${[1,2,3,4,5].map(p=>`<option value="${p}"${a&&a.phase===p?" selected":""}>${p}</option>`).join("")}</select></div><div><label class="lbl">SEMANA</label><input type="number" class="inp" id="f-wk" value="${v("week","1")}" min="1" max="12"></div><div></div></div>`;
+  h+=`<div class="g3" style="margin-bottom:10px"><div><label class="lbl">V</label><input type="number" class="inp" id="f-wn" value="${v("wins","0")}" min="0"></div><div><label class="lbl">D</label><input type="number" class="inp" id="f-wl" value="${v("losses","0")}" min="0"></div><div><label class="lbl">E</label><input type="number" class="inp" id="f-wd" value="${v("draws","0")}" min="0"></div></div>`;
+  h+=`<div style="margin-bottom:14px"><label class="lbl">NOTAS</label><textarea class="inp" id="f-nt" rows="2" style="resize:none">${v("notes")}</textarea></div>`;
+  h+=`<div class="${isEdit?"g2":""}">`;
+  if(isEdit){
+    h+=`<button onclick="saveAthlete('${a.id}')" class="btn btn-g">GUARDAR</button>`;
+    h+=`<button onclick="deleteAthlete('${a.id}')" class="btn btn-r">ELIMINAR</button>`;
+  } else {
+    h+=`<button onclick="saveAthlete(null)" class="btn btn-g">REGISTRAR ATLETA</button>`;
+  }
+  h+=`</div>`;
+  return h;
+}
+
+function saveAthlete(existId){
+  const name=gv("f-name");
+  if(!name.trim()){alert(L("El nombre es obligatorio","Name is required"));return;}
+  const pin=gv("f-pin");
+  if(pin.length!==4||isNaN(pin)){alert(L("El PIN debe ser 4 dígitos numéricos","PIN must be 4 numeric digits"));return;}
+  const data={name:name.trim(),dob:gv("f-dob"),weight:parseFloat(gv("f-wt"))||0,category:gv("f-cat"),group:gv("f-grp"),status:gv("f-st")||"Activo",phase:parseInt(gv("f-ph"))||1,week:parseInt(gv("f-wk"))||1,wins:parseInt(gv("f-wn"))||0,losses:parseInt(gv("f-wl"))||0,draws:parseInt(gv("f-wd"))||0,notes:gv("f-nt"),pin:pin};
+  if(existId){ST.athletes=ST.athletes.map(a=>a.id===existId?{...a,...data}:a);}
+  else{ST.athletes=[...ST.athletes,{...data,id:uid()}];}
+  sv("cba_athletes",ST.athletes);
+  closeModal();reRender();
+}
+
+function deleteAthlete(id){
+  if(!confirm(L("¿Eliminar este atleta?","Delete this athlete?")))return;
+  ST.athletes=ST.athletes.filter(a=>a.id!==id);
+  sv("cba_athletes",ST.athletes);
+  closeModal();reRender();
+}
+
+function advWeek(id){
+  const a=ST.athletes.find(x=>x.id===id);if(!a)return;
+  const maxW=Object.keys({1:12,2:10,3:8,4:4})[a.phase-1]?parseInt(Object.values({1:12,2:10,3:8,4:4})[a.phase-1]):4;
+  let np=a.phase,nw=a.week+1;
+  if(nw>maxW){nw=1;np=Math.min(np+1,5);}
+  ST.athletes=ST.athletes.map(x=>x.id===id?{...x,phase:np,week:nw}:x);
+  sv("cba_athletes",ST.athletes);
+  closeModal();reRender();
+}
+
+// ─── TRAINING ─────────────────────────────────────────────────────────────
+function renderTraining(){
+  const athId=ST.isCoach?(ST.trainPick||ST.athletes[0]?.id):ST.user?.id;
+  const ath=ST.athletes.find(a=>a.id===athId)||ST.athletes[0];
+  if(!ath)return ec(L("Sin atletas","No athletes"));
+  const day=ST.trainDay!==null?ST.trainDay:new Date().getDay();
+  const DAYS=["DOM","LUN","MAR","MIÉ","JUE","VIE","SÁB"];
+  const maxW={1:12,2:10,3:8,4:4,5:0}[ath.phase]||4;
+  const prog=Math.round((ath.week/maxW)*100)||0;
+  let h="";
+  if(ST.isCoach){
+    h+=`<select class="inp" onchange="ST.trainPick=this.value;reRender()" style="margin-bottom:12px;border-color:#D4A017">`;
+    ST.athletes.forEach(a=>{h+=`<option value="${a.id}"${a.id===athId?" selected":""}>${esc(a.name)}</option>`;});
+    h+=`</select>`;
+  }
+  h+=`<div class="card" style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div><div style="font-size:18px;font-weight:900;color:#fff">${L("Fase","Phase")} ${ath.phase}</div><div style="font-size:11px;color:#7a9ab5">${pName(ath.phase)}</div></div><div style="background:${PC[ath.phase]};border-radius:8px;padding:6px 12px;font-weight:800;font-size:16px;color:#fff">S${ath.week}</div></div>`;
+  h+=`<div class="prog"><div class="prog-fill" style="width:${prog}%"></div></div>`;
+  h+=`<div style="display:flex;justify-content:space-between;margin-top:4px"><span style="font-size:10px;color:#7a9ab5">Semana ${ath.week} de ${maxW}</span><span style="font-size:10px;color:#D4A017;font-weight:600">${prog}% completado</span></div></div>`;
+  // Day selector
+  h+=`<div style="display:flex;gap:4px;margin-bottom:12px">${[1,2,3,4,5,6,0].map((d,i)=>`<button onclick="ST.trainDay=${d};reRender()" style="flex:1;background:${day===d?"#D4A017":"#0f1e35"};color:${day===d?"#000":"#7a9ab5"};border:none;border-radius:6px;padding:7px 2px;font-size:9px;font-weight:700">${DAYS[d]}</button>`).join("")}</div>`;
+  // Session content
+  const sessData=getSession(ath.phase,ath.week,day,ath.group||"Mayores 16");
+  h+=`<div class="card" style="border-color:${sessData.color}">`;
+  h+=`<div style="font-size:16px;font-weight:900;color:#fff;margin-bottom:6px">${esc(sessData.title)}</div>`;
+  if(sessData.blocks.length){
+    if(sessData.rival)h+=`<div style="font-size:11px;color:#D4A017;margin-bottom:8px">👊 ${esc(sessData.rival)} — ${sessData.pct}%</div>`;
+    sessData.blocks.forEach((b,i)=>{
+      h+=`<div style="display:flex;gap:10px;padding:7px 0;border-top:1px solid #0f1e35">`;
+      h+=`<div style="width:46px;text-align:right;color:#D4A017;font-size:12px;font-weight:700;flex-shrink:0;padding-top:1px">${esc(b.t)}</div>`;
+      h+=`<div><div style="font-size:13px;font-weight:700;color:#fff">${esc(b.n)}</div><div style="font-size:11px;color:#7a9ab5">${esc(b.d)}</div></div>`;
+      h+=`</div>`;
+    });
+    h+=`<div style="display:flex;justify-content:space-between;padding-top:8px;border-top:1px solid #1e3050;margin-top:4px"><span style="font-size:12px;color:#7a9ab5;font-weight:700">TOTAL</span><span style="font-size:14px;color:#D4A017;font-weight:900">${sessData.dur} min</span></div>`;
+  }
+  h+=`</div>`;
+  if(ST.isCoach)h+=`<button onclick="advWeek('${ath.id}')" class="btn btn-gr" style="margin-top:10px">AVANZAR SEMANA ▶</button>`;
+  return h;
+}
+
+function getSession(phase,week,dow,group){
+  const di=dow===0?6:dow-1;
+  const is90=!(group&&(group.includes("C")||group.includes("B")));
+  if(di>=5)return{title:L("Descanso Completo","Full Rest"),blocks:[],color:"#1e3050",rival:"",pct:0,dur:0};
+  const color=PC[phase]||PC[1];
+  const RIVALS={1:["Estático","Retrocede","Retrocede","Responde","Baja guardia","Zurdo básico","Activo","Zurdo activo","Rival alto","Contragolpeador","Impredecible","Libre"],2:["Presionador","Buscador cuerpo","Zurdo activo","Contragolpeador","Rival alto","Retrocede","Cambia estilo","Todos estilos","Todos estilos","Libre"],3:["Presionador","Doble amenaza","Presionador zurdo","Contragolpeador avanzado","Alto cambia ritmo","Todos estilos","Libre","Libre"],4:["Rival de la pelea","Rival de la pelea","Plan fijo","Combate real"]};
+  const PCTS={1:[65,67,70,72,74,76,78,80,82,84,86,88],2:[80,82,83,84,85,86,87,89,90,91],3:[88,89,90,91,92,93,95,95],4:[88,80,70,65]};
+  const rival=(RIVALS[phase]||[])[week-1]||"Rival activo";
+  const pct=(PCTS[phase]||[])[week-1]||80;
+  const SESSION_NAMES={
+    1:{0:"Cuerda + Construcción",1:"Carrera + Escuela",2:"Cuerda + Aplicación",3:"Carrera + Sparring",4:"Tramos + Evaluación"},
+    2:{0:"Cuerda + Mascota + Saco",1:"Carrera + Escuela + Sparring",2:"Cuerda + Mascota + Saco",3:"Carrera + Sparring",4:"Tramos + Shadow + Evaluación"},
+    3:{0:"Cuerda + Mascota Asfixia",1:"Carrera + Sparring Libre",2:"Cuerda + Mascota Asfixia",3:"Carrera + Sparring Libre",4:"Tramos + Shadow + Evaluación"},
+    4:{0:"ÚLTIMA CARGA — Mascota",1:"ÚLTIMA CARGA — Sparring",2:"REDUCCIÓN — Mascota",3:"REDUCCIÓN — Sparring",4:"EVALUACIÓN"}
+  };
+  const title=(SESSION_NAMES[phase]||{})[di]||L("Entrenamiento","Training");
+  // Build blocks
+  const blocks=[];
+  const B=(n,d,t)=>({n,d,t});
+  const warm=B(L("Calentamiento","Warm-up"),L("Movilidad completa","Full mobility"),is90?"12 min":"10 min");
+  blocks.push(warm);
+  if(di===0||di===2){
+    blocks.push(B(L("Cuerda imaginaria","Shadow rope"),L(is90?"20 min":"15 min — ritmo combate","20 min — fight rhythm"),is90?"20 min":"15 min"));
+    blocks.push(B("Shadow Sagarra",rival+" — "+pct+"%",is90?"10 min":"8 min"));
+    blocks.push(B(L("Técnica/Mascota","Technical/Pads"),L("Construcción táctica","Tactical build"),is90?"18 min":"12 min"));
+    blocks.push(B(L("Saco","Bag"),L(is90?"3×3min/1min":"3×2min/1min","3 rounds"),is90?"11 min":"8 min"));
+    blocks.push(B(L("Físico","Physical"),L("Protocolo bloque","Block protocol"),is90?"12 min":"7 min"));
+  } else if(di===1||di===3){
+    blocks.push(B(L("Carrera continua","Continuous run"),is90?"20 min suave":"15 min suave",is90?"20 min":"15 min"));
+    blocks.push(B("Shadow Sagarra",rival+" — "+pct+"%",is90?"10 min":"8 min"));
+    blocks.push(B(L("Escuela combate","Combat school"),L("Corrección técnica","Technical correction"),is90?"15 min":"10 min"));
+    if(phase>=2)blocks.push(B(L("Sparring condicionado","Conditioned sparring"),is90?"4×3min/1min":"3×2min/1min",is90?"15 min":"10 min"));
+    blocks.push(B(L("Físico","Physical"),L("Protocolo bloque","Block protocol"),is90?"8 min":"5 min"));
+  } else {
+    blocks.push(B(L("Tramos","Sprints"),"4×50m / "+pct+"%","8 min"));
+    blocks.push(B(L("Shadow evaluado","Evaluated shadow"),L("Entrenador observa","Coach observes"),is90?"15 min":"12 min"));
+    blocks.push(B(L("Saco evaluación","Evaluation bag"),is90?"3×3min/1min":"3×2min/1min",is90?"11 min":"8 min"));
+    blocks.push(B(L("Evaluación semanal","Weekly eval"),L("2 positivos + 1 a mejorar","2 positives + 1 to improve"),is90?"10 min":"7 min"));
+  }
+  blocks.push(B(L("Estiramiento","Stretching"),L("Completo","Full"),"5 min"));
+  const dur=blocks.reduce((s,b)=>s+(parseInt(b.t)||0),0);
+  return{title,blocks,color,rival,pct,dur};
+}
+
+// ─── FIGHTS ────────────────────────────────────────────────────────────────
+function renderFights(){
+  const fights=ST.isCoach?ST.fights:ST.fights.filter(f=>f.athId===ST.user?.id);
+  const w=fights.filter(f=>f.result==="Victoria"||f.result==="Win").length;
+  const l=fights.filter(f=>f.result==="Derrota"||f.result==="Loss").length;
+  const d=fights.filter(f=>f.result==="Empate"||f.result==="Draw").length;
+  let h=`<div class="card gold" style="text-align:center;margin-bottom:14px"><div style="font-size:11px;color:#D4A017;letter-spacing:2px;margin-bottom:8px">RÉCORD</div><div class="g3"><div><div style="font-size:38px;font-weight:900;color:#1a8f4c">${w}</div><div style="font-size:9px;color:#7a9ab5">VICTORIAS</div></div><div><div style="font-size:38px;font-weight:900;color:#c0392b">${l}</div><div style="font-size:9px;color:#7a9ab5">DERROTAS</div></div><div><div style="font-size:38px;font-weight:900;color:#7a9ab5">${d}</div><div style="font-size:9px;color:#7a9ab5">EMPATES</div></div></div></div>`;
+  if(ST.isCoach)h+=`<button onclick="openAddFight()" class="btn btn-g" style="margin-bottom:14px">+ REGISTRAR PELEA</button>`;
+  if(!fights.length)return h+ec(L("Sin peleas registradas","No fights registered"));
+  [...fights].sort((a,b)=>new Date(b.date||0)-new Date(a.date||0)).forEach(f=>{
+    const a=ST.athletes.find(x=>x.id===f.athId);
+    const isW=f.result==="Victoria"||f.result==="Win";
+    const isL=f.result==="Derrota"||f.result==="Loss";
+    const up=f.date&&new Date(f.date)>=new Date();
+    const c=isW?"#1a8f4c":isL?"#c0392b":"#7a9ab5";
+    h+=`<div class="card" style="border-left:4px solid ${up?"#D4A017":c};margin-bottom:8px">`;
+    h+=`<div style="display:flex;justify-content:space-between;align-items:flex-start">`;
+    h+=`<div style="flex:1"><div style="font-weight:800;font-size:16px;color:#fff">${esc(a?a.name:"—")}</div><div style="font-size:13px;color:#7a9ab5">vs <span style="color:#fff">${esc(f.opp||"")}</span></div><div style="font-size:11px;color:#D4A017;margin-top:4px">${fD(f.date)}${f.event?" • "+esc(f.event):""}</div></div>`;
+    h+=`<div style="background:${up?"#1a3a0a":c};border-radius:8px;padding:6px 10px;font-weight:800;font-size:11px;color:#fff">${up?"PRÓXIMA":esc(f.result||"").toUpperCase()}</div>`;
+    h+=`</div>${f.notes?`<div style="font-size:11px;color:#7a9ab5;margin-top:8px;padding-top:8px;border-top:1px solid #1e3050">${esc(f.notes)}</div>`:""}</div>`;
+  });
+  return h;
+}
+
+let _fRes=3;
+function openAddFight(){
+  let h=`<div style="font-size:19px;font-weight:900;color:#D4A017;margin-bottom:16px">+ REGISTRAR PELEA</div>`;
+  h+=`<div style="margin-bottom:10px"><label class="lbl">ATLETA</label><select class="sel" id="f-ath"><option value="">Seleccionar...</option>${ST.athletes.map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join("")}</select></div>`;
+  h+=`<div style="margin-bottom:10px"><label class="lbl">RIVAL</label><input class="inp" id="f-opp" placeholder="Nombre del rival"></div>`;
+  h+=`<div style="margin-bottom:10px"><label class="lbl">FECHA</label><input type="date" class="inp" id="f-date"></div>`;
+  h+=`<div class="g2" style="margin-bottom:10px"><div><label class="lbl">PESO</label><input class="inp" id="f-wc" placeholder="132 lbs"></div><div><label class="lbl">EVENTO</label><input class="inp" id="f-ev" placeholder="Evento"></div></div>`;
+  h+=`<div style="margin-bottom:10px"><label class="lbl">RESULTADO</label><div style="display:flex;gap:6px">`;
+  ["Victoria","Derrota","Empate","Próxima"].forEach((r,i)=>{
+    const cs=["#1a6b3c","#8b1a1a","#4a4a1a","#1a4a7a"];
+    h+=`<button id="fr${i}" onclick="setFR(${i})" style="flex:1;background:${i===3?cs[3]:"#0f1e35"};border:none;color:#fff;border-radius:8px;padding:10px 4px;font-weight:700;font-size:10px;cursor:pointer">${r.toUpperCase()}</button>`;
+  });
+  h+=`</div></div>`;
+  h+=`<div style="margin-bottom:14px"><label class="lbl">NOTAS</label><textarea class="inp" id="f-fn" rows="2" style="resize:none"></textarea></div>`;
+  h+=`<button onclick="saveFight()" class="btn btn-g">GUARDAR PELEA</button>`;
+  _fRes=3;
+  showModal(h);
+}
+
+function setFR(i){
+  _fRes=i;
+  [0,1,2,3].forEach(j=>{
+    const b=$("fr"+j);
+    if(b)b.style.background=j===i?["#1a6b3c","#8b1a1a","#4a4a1a","#1a4a7a"][j]:"#0f1e35";
+  });
+}
+
+function saveFight(){
+  const athId=gv("f-ath");
+  if(!athId){alert("Selecciona un atleta");return;}
+  const results=["Victoria","Derrota","Empate","Próxima"];
+  const f={id:uid(),athId,opp:gv("f-opp"),date:gv("f-date"),result:results[_fRes],wc:gv("f-wc"),event:gv("f-ev"),notes:gv("f-fn")};
+  ST.fights=[...ST.fights,f];
+  sv("cba_fights",ST.fights);
+  closeModal();reRender();
+}
+
+// ─── TACTICS ──────────────────────────────────────────────────────────────
+function renderTactics(){
+  let h=sh("7 ESTILOS DE COMBATE","🥊");
+  STYLES.forEach((st,i)=>{
+    const isO=ST.openStyle===i;
+    h+=`<div style="border-left:4px solid ${st.color};border-radius:10px;background:#0f1e35;margin-bottom:8px;overflow:hidden">`;
+    h+=`<div style="padding:12px 14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center" onclick="ST.openStyle=ST.openStyle===${i}?null:${i};reRender()">`;
+    h+=`<div><div style="font-weight:800;font-size:16px;color:#fff">${esc(st.name)}</div><div style="font-size:11px;color:#7a9ab5">${esc(st.desc)}</div></div>`;
+    h+=`<span style="color:#D4A017;font-size:14px">${isO?"▲":"▼"}</span></div>`;
+    if(isO){
+      h+=`<div style="padding:0 14px 14px">`;
+      h+=`<div style="background:#0a1628;border-radius:8px;padding:10px;margin-bottom:8px"><div style="font-size:11px;color:#c0392b;font-weight:700;margin-bottom:4px">⚠ PELIGRO</div><div style="font-size:12px;color:#fff">${esc(st.danger)}</div></div>`;
+      h+=`<div style="background:#0a1628;border-radius:8px;padding:10px;margin-bottom:8px"><div style="font-size:11px;color:#D4A017;font-weight:700;margin-bottom:4px">👁 SEÑAL</div><div style="font-size:12px;color:#fff">${esc(st.tell)}</div></div>`;
+      h+=`<div class="g2" style="margin-bottom:8px">`;
+      h+=`<div style="background:#0f2e1a;border:1px solid #1a6b3c;border-radius:8px;padding:10px"><div style="font-size:10px;color:#1a8f4c;font-weight:700;margin-bottom:4px">PLAN A</div><div style="font-size:11px;color:#fff;line-height:1.4">${esc(st.planA)}</div></div>`;
+      h+=`<div style="background:#2e0f0f;border:1px solid #8b1a1a;border-radius:8px;padding:10px"><div style="font-size:10px;color:#c0392b;font-weight:700;margin-bottom:4px">PLAN B</div><div style="font-size:11px;color:#fff;line-height:1.4">${esc(st.planB)}</div></div>`;
+      h+=`</div>`;
+      h+=`<div style="background:#0a1628;border-radius:8px;padding:10px;margin-bottom:8px"><div style="font-size:10px;color:#D4A017;font-weight:700;margin-bottom:8px">🎯 LOS 3 PUNTOS</div>`;
+      st.pts.forEach((p,j)=>{h+=`<div style="display:flex;gap:8px;margin-bottom:6px;align-items:flex-start"><div style="background:${st.color};color:#fff;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;margin-top:1px">${j+1}</div><div style="font-size:11px;color:#fff;line-height:1.4">${esc(p)}</div></div>`;});
+      h+=`</div>`;
+      h+=`<div style="background:#0a1628;border-radius:8px;padding:10px"><div style="font-size:10px;color:#7a9ab5;font-weight:700;margin-bottom:8px">⏱ ASALTO POR ASALTO</div>`;
+      [["Asalto 1",st.r1],["Asalto 2",st.r2],["Asalto 3",st.r3]].forEach(([rl,rv])=>{h+=`<div style="margin-bottom:6px"><div style="font-size:10px;color:#D4A017;font-weight:700">${rl}</div><div style="font-size:11px;color:#fff">${esc(rv)}</div></div>`;});
+      h+=`</div></div>`;
+    }
+    h+=`</div>`;
+  });
+  return h;
+}
+
+// ─── NUTRITION ────────────────────────────────────────────────────────────
+function renderNutrition(){
+  let h=sh("NUTRICIÓN DE COMPETENCIA","🥗");
+  h+=`<div class="card" style="background:linear-gradient(135deg,#0a1628,#162540);border-color:#D4A017;margin-bottom:14px"><div style="font-size:10px;color:#D4A017;letter-spacing:1px;margin-bottom:4px">⚠ IMPORTANTE</div><div style="font-size:12px;color:#fff;line-height:1.6">Plan basado en ciencia deportiva y experiencia de boxeo de élite. Consulta con Coach Osvimer antes de cambios en competencia.</div></div>`;
+  // Phase tabs
+  h+=`<div style="display:flex;gap=6px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px;gap:6px">`;
+  NUT_PHASES.forEach(p=>{h+=`<button onclick="ST.openNut='${p.id}';reRender()" style="white-space:nowrap;background:${ST.openNut===p.id?p.color:"#0f1e35"};border:2px solid ${p.color};color:${ST.openNut===p.id?"#fff":"#7a9ab5"};border-radius:20px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer">${p.icon} ${p.title.split("—")[0].trim()}</button>`;});
+  h+=`</div>`;
+  const ph=NUT_PHASES.find(p=>p.id===ST.openNut)||NUT_PHASES[0];
+  if(ph){
+    h+=`<div style="background:${ph.color};border-radius:14px 14px 0 0;padding:14px"><div style="font-size:16px;font-weight:900;color:#fff">${ph.icon} ${ph.title}</div><div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:2px">${ph.weeks}</div></div>`;
+    h+=`<div style="background:#0f1e35;border-radius:0 0 14px 14px;padding:14px;margin-bottom:14px;border:1px solid ${ph.color};border-top:none">`;
+    ph.meals.forEach(m=>{
+      h+=`<div class="meal"><div style="font-size:11px;font-weight:900;color:#D4A017;letter-spacing:1px;margin-bottom:6px">${esc(m.t)}</div>`;
+      h+=`<ul style="list-style:none;padding:0">`;m.items.forEach(item=>{h+=`<li style="font-size:12px;color:#fff;padding:2px 0"><span style="color:#D4A017">• </span>${esc(item)}</li>`;});h+=`</ul>`;
+      h+=`<div style="display:flex;justify-content:space-between;margin-top:8px;padding-top:6px;border-top:1px solid #1e3050"><span style="font-size:11px;color:#D4A017;font-weight:700">${esc(m.cal)}</span><span style="font-size:10px;color:#7a9ab5">${esc(m.mac)}</span></div></div>`;
+    });
+    h+=`<div style="background:linear-gradient(135deg,${ph.color},#070d1a);border-radius:8px;padding:10px"><div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:4px">TOTAL DIARIO</div><div style="font-size:15px;font-weight:900;color:#D4A017">${ph.total}</div><div style="font-size:11px;color:rgba(255,255,255,.8);margin-top:6px;line-height:1.4">${ph.nota}</div></div></div>`;
+  }
+  // Weight cut
+  h+=sh("PROTOCOLO BAJADA DE PESO","⚖️");
+  const CUT=[{s:"8+ sem",t:"Corte Natural",d:"Dieta limpia + entreno. Pérdida max 0.5kg/semana.",c:"#1a6b3c"},{s:"4-2 sem",t:"Corte Calórico",d:"Reducir 300-500 kcal/día. Eliminar sodio, azúcar, alcohol.",c:"#D4A017"},{s:"1 sem",t:"Reducción Sodio",d:"Sodio <1000mg/día. Reducir carbos 50%. Agua: 2L/día.",c:"#c0392b"},{s:"2-3 días",t:"Reducción Agua",d:"Agua 1L/día. Sauna max 15 min. SIEMPRE supervisado.",c:"#8b1a1a"},{s:"Post-pesaje",t:"REPOSICIÓN",d:"Min 1.5L bebida deportiva en primera hora.",c:"#5b2c8d"}];
+  h+=`<div style="background:#0f1e35;border-radius:12px;overflow:hidden;margin-bottom:10px">`;
+  CUT.forEach(s=>{h+=`<div style="display:flex;gap:10px;padding:10px 14px;border-bottom:1px solid #070d1a"><div style="flex-shrink:0"><div style="background:${s.c};border-radius:6px;padding:2px 6px;font-size:9px;font-weight:700;color:#fff;white-space:nowrap">${s.s}</div></div><div><div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:2px">${s.t}</div><div style="font-size:11px;color:#7a9ab5;line-height:1.4">${s.d}</div></div></div>`;});
+  h+=`</div>`;
+  h+=`<div style="background:#1a0000;border:2px solid #c0392b;border-radius:10px;padding:12px;margin-bottom:14px"><div style="font-size:12px;color:#ff6b6b;line-height:1.5">⚠ NUNCA bajar más del 8-10% del peso corporal. Bajar más de 5kg en agua es PELIGROSO. Siempre supervisado por el coach.</div></div>`;
+  return h;
+}
+
+// ─── STORE ────────────────────────────────────────────────────────────────
+function renderStore(){
+  const TAG="osvimerboxing-20";
+  const amz=q=>"https://www.amazon.com/s?k="+encodeURIComponent(q)+"&tag="+TAG;
+  const cats=[
+    {ic:"🥊",n:"Guantes de Boxeo",b:["Everlast","Adidas","Hayabusa","Venum","Rival","Ringside","Title","Cleto Reyes","Fairtex","RDX"]},
+    {ic:"🪖",n:"Cascos",b:["Everlast","Adidas","Rival","Ringside","Title","Hayabusa","Venum"]},
+    {ic:"🩹",n:"Vendas",b:["Everlast","Adidas","Rival","Title","Ringside","Venum"]},
+    {ic:"👟",n:"Calzado Boxeo",b:["Adidas","Nike","Everlast","Title","Rival"]},
+    {ic:"👕",n:"Shorts / Ropa",b:["Everlast","Adidas","Nike","Venum","Rival","Title"]},
+    {ic:"🎯",n:"Sacos",b:["Everlast","Title","Ringside","Rival","RDX"]},
+    {ic:"🤜",n:"Mitts / Pads",b:["Cleto Reyes","Winning","Everlast","Title","Rival"]},
+    {ic:"🏃",n:"Zapatos Correr",b:["Nike","Adidas","Brooks","New Balance","ASICS","Saucony","Hoka"]},
+    {ic:"🥤",n:"Nutrición Deportiva",b:["Optimum Nutrition","BSN","Dymatize","Muscle Milk","Gatorade","Clif Bar","GU Energy"]},
+    {ic:"💊",n:"Suplementos",b:["ON Creatine","NOW Sports Omega-3","Life Extension Magnesium","NatureWise Vitamin D3"]},
+    {ic:"🧴",n:"Recuperación",b:["Biofreeze","Tiger Balm","Theragun","Hyperice","RumbleRoller"]},
+  ];
+  let h=sh("TIENDA DE BOXEO","🛒");
+  h+=`<div class="card" style="text-align:center;margin-bottom:14px"><div style="font-size:11px;color:#D4A017;margin-bottom:4px">AMAZON ASSOCIATES</div><div style="font-size:13px;color:#fff">Coach Osvimer Rodriguez • Tag: ${TAG}</div></div>`;
+  cats.forEach(cat=>{
+    h+=`<div style="margin-bottom:14px"><div style="font-size:12px;font-weight:900;color:#D4A017;margin-bottom:8px">${cat.ic} ${cat.n.toUpperCase()}</div><div class="g2">`;
+    cat.b.forEach(b=>{h+=`<div style="background:#0f1e35;border:1px solid #1e3050;border-radius:10px;padding:10px;cursor:pointer" onclick="window.open('${amz(b+" "+cat.n+" boxing")}','_blank')"><div style="font-size:12px;font-weight:700;color:#fff;margin-bottom:4px">${esc(b)}</div><div style="font-size:9px;color:#D4A017;font-weight:700">VER EN AMAZON ↗</div></div>`;});
+    h+=`</div></div>`;
+  });
+  return h;
+}
+
+// ─── NOTES ────────────────────────────────────────────────────────────────
+function renderNotes(){
+  if(ST.isCoach)return renderCoachNotes();
+  if(!ST.user)return ec("Inicia sesión primero");
+  const msgs=ld(MSG_KEY+ST.user.id,[]);
+  const today=new Date().toISOString().split("T")[0];
+  const todayNote=msgs.find(m=>m.type==="note"&&m.date===today);
+  const replies=msgs.filter(m=>m.type==="reply");
+  let h=sh("MIS NOTAS DE HOY","📝");
+  h+=`<div style="background:#070d1a;border:1px solid #1e3050;border-radius:10px;padding:12px;margin-bottom:10px;min-height:60px">`;
+  h+=todayNote?`<div style="font-size:13px;color:#fff;line-height:1.5;white-space:pre-wrap">${esc(todayNote.text)}</div><div style="font-size:10px;color:#7a9ab5;margin-top:8px">${fD(todayNote.date)}</div>`:`<div style="font-size:12px;color:#4a6a8a">Sin notas hoy.</div>`;
+  h+=`</div>`;
+  h+=`<textarea class="inp" id="note-txt" rows="3" style="resize:none;margin-bottom:8px" placeholder="Escribe aquí...">${todayNote?esc(todayNote.text):""}</textarea>`;
+  h+=`<button onclick="saveNote()" class="btn btn-g" style="margin-bottom:16px">GUARDAR NOTA</button>`;
+  if(replies.length){
+    h+=sh("RESPUESTAS DEL COACH","📬");
+    replies.slice(-3).reverse().forEach(m=>{h+=`<div style="background:#1a6b3c;border-radius:10px;padding:10px;margin-bottom:8px"><div style="font-size:11px;color:#D4A017;font-weight:700;margin-bottom:4px">Coach Osvimer</div><div style="font-size:12px;color:#fff">${esc(m.text)}</div><div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:4px">${fD(m.date)}</div></div>`;});
+  }
+  h+=sh("PREGUNTAR AL COACH","❓");
+  h+=`<textarea class="inp" id="q-txt" rows="2" style="resize:none;margin-bottom:8px" placeholder="Escribe tu pregunta..."></textarea>`;
+  h+=`<button onclick="sendQ()" class="btn" style="background:#1a4a7a;color:#fff">ENVIAR PREGUNTA</button>`;
+  return h;
+}
+
+function renderCoachNotes(){
+  let h=sh("COMUNICACIÓN CON ATLETAS","💬");
+  ST.athletes.forEach(a=>{
+    const msgs=ld(MSG_KEY+a.id,[]);
+    const qs=msgs.filter(m=>m.type==="question");
+    const unread=qs.filter(m=>!m.read).length;
+    h+=`<div class="card" style="margin-bottom:10px">`;
+    h+=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">${av(a.name,38)}<div style="flex:1"><div style="font-weight:800;font-size:15px;color:#fff">${esc(a.name)}</div>${unread>0?`<span style="background:#c0392b;color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700">${unread} nuevas</span>`:""}</div></div>`;
+    if(qs.length){qs.slice(-2).forEach(q=>{h+=`<div style="background:#0a1628;border-radius:8px;padding:8px;margin-bottom:6px"><div style="font-size:10px;color:#7a9ab5">${fD(q.date)}</div><div style="font-size:12px;color:#fff">${esc(q.text)}</div></div>`;});}
+    h+=`<div style="display:flex;gap:8px;margin-top:8px"><textarea id="rep-${a.id}" class="inp" rows="2" style="flex:1;resize:none" placeholder="Responder..."></textarea><button onclick="sendReply('${a.id}')" class="btn btn-g" style="width:auto;padding:10px 14px;font-size:13px">→</button></div>`;
+    h+=`</div>`;
+  });
+  return h;
+}
+
+function saveNote(){
+  if(!ST.user)return;
+  const txt=gv("note-txt");if(!txt.trim())return;
+  const msgs=ld(MSG_KEY+ST.user.id,[]);
+  const today=new Date().toISOString().split("T")[0];
+  const filtered=msgs.filter(m=>!(m.type==="note"&&m.date===today));
+  filtered.push({type:"note",text:txt,date:today,from:"athlete"});
+  sv(MSG_KEY+ST.user.id,filtered);reRender();
+}
+
+function sendQ(){
+  if(!ST.user)return;
+  const txt=gv("q-txt");if(!txt.trim())return;
+  const msgs=ld(MSG_KEY+ST.user.id,[]);
+  msgs.push({type:"question",text:txt,date:new Date().toISOString().split("T")[0],from:"athlete",read:false});
+  sv(MSG_KEY+ST.user.id,msgs);
+  window.open("https://wa.me/17027234009?text="+encodeURIComponent("Hola Coach Osvimer, soy "+ST.user.name+": "+txt),"_blank");
+  reRender();
+}
+
+function sendReply(athId){
+  const el=$("rep-"+athId);if(!el||!el.value.trim())return;
+  const msgs=ld(MSG_KEY+athId,[]);
+  msgs.push({type:"reply",text:el.value,date:new Date().toISOString().split("T")[0],from:"coach"});
+  sv(MSG_KEY+athId,msgs);reRender();
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────
+window.addEventListener("DOMContentLoaded",function(){
+  // Load data
+  const sa=ld("cba_athletes",[]);
+  const sf=ld("cba_fights",[]);
+  ST.athletes=sa.length?sa:DA;
+  ST.fights=sf.length?sf:DF;
+  if(!sa.length)sv("cba_athletes",DA);
+  if(!sf.length)sv("cba_fights",DF);
+  ST.lang=ld("cba_lang","es")||"es";
+  // PWA
+  try{injectPWA();}catch(e){}
+  // Draw login logo
+  setTimeout(()=>{const c=$("logo-canvas");if(c){const img=new Image();img.onload=()=>{const ctx=c.getContext("2d");ctx.drawImage(img,0,0,100,100);};img.src=makeLogo(100);}},100);
+  // ALWAYS show login
+  showLogin();
+});
+</script>
+</body>
+</html>
